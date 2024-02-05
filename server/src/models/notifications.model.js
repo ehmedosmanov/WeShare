@@ -13,3 +13,7 @@ const notificationSchema = new Schema({
   read: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 })
+
+const Notification = mongoose.model('Notification', notificationSchema)
+
+export default Notification

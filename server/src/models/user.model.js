@@ -114,6 +114,11 @@ userSchema.methods.generatePasswordResetToken = function () {
   this.resetPasswordExpires = Date.now() + 3600000 // Expires in an hour
 }
 
+userSchema.methods.generateForgetPasswordToken = function () {
+  this.forgetPasswordToken = crypto.randomBytes(20).toString('hex')
+  this.forgetPasswordExpires = Date.now() + 3600000 // Expires in an hour
+}
+
 userSchema.methods.emailVerification = function () {
   this.emailVerificationToken = crypto.randomBytes(20).toString('hex')
   this.emailVerificationExpires = Date.now() + 3600000 //Expires in an hour
@@ -122,7 +127,7 @@ userSchema.methods.emailVerification = function () {
 userSchema.methods.generateOtpToken = function () {
   this.otpCode = otpGenerator.generate(6, {
     digits: true,
-    alphabets: falses,
+    alphabets: false,
     upperCase: false,
     specialChars: false
   })

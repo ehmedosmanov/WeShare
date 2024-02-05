@@ -1,8 +1,16 @@
 import Joi from 'joi'
 
 const userValidationSchema = Joi.object({
-  firstName: Joi.string().trim().required(),
-  lastName: Joi.string().trim().required(),
+  firstName: Joi.string()
+    .pattern(/^[a-zA-Z]+$/)
+    .message('Please enter only letters')
+    .trim()
+    .required(),
+  lastName: Joi.string()
+    .pattern(/^[a-zA-Z]+$/)
+    .message('Please enter only letters')
+    .trim()
+    .required(),
   username: Joi.string().trim().required(),
   phoneNumber: Joi.string()
     .trim()
@@ -11,7 +19,21 @@ const userValidationSchema = Joi.object({
     )
     .message('Phone number must contain only digits'),
   email: Joi.string().trim().email().required(),
-  password: Joi.string().required(),
+  password: Joi.string()
+    .min(8)
+    .message('Password must be at least 8 characters long')
+    .max(14)
+    .message('Password must not exceed 14 characters')
+    .required()
+    .pattern(
+      new RegExp(
+        '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,14}$'
+      )
+    )
+    .message(
+      'Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character'
+    ),
+
   avatar: Joi.string().trim().uri(),
   cover: Joi.string().trim().uri(),
   status: Joi.string().valid('Online', 'Offline'),

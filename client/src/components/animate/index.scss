@@ -1,0 +1,78 @@
+.lines {
+  .line {
+    position: absolute;
+    width: 1px;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: -1;
+
+    &::after {
+      content: '';
+      display: block;
+      position: absolute;
+      height: 30px;
+      width: 100%;
+      top: 0%;
+      left: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 217, 0, 0) 0%,
+        #ffd900 75%,
+        #ffd900 100%
+      );
+      animation: run 4s 0s infinite linear;
+      animation-fill-mode: forwards;
+    }
+
+    &:nth-child(3n + 1)::after {
+      top: unset;
+      animation: run 3s 0s infinite linear;
+    }
+
+    @for $i from 1 through 16 {
+      &:nth-child(#{$i}) {
+        left: #{$i * 6%};
+      }
+    }
+
+    @include maxQuery(991) {
+      &:nth-child(2n) {
+        display: none;
+      }
+    }
+  }
+
+  .line-vertical {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    top: 0;
+    left: 0;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: -1;
+
+    @for $i from 1 through 10 {
+      &:nth-child(#{$i}) {
+        top: #{$i * 10%};
+      }
+    }
+
+    @include maxQuery(767) {
+      &:nth-child(2n) {
+        display: none;
+      }
+    }
+  }
+}
+
+@keyframes run {
+  0% {
+    top: 0%;
+  }
+
+  100% {
+    top: 100%;
+  }
+}

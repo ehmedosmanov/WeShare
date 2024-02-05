@@ -1,9 +1,10 @@
 import express from 'express'
-import { register, verifyEmail } from '../controllers/authController.js'
+import { login, register, verifyEmail } from '../controllers/authController.js'
 
-const router = express.Router()
+const authRouter = express.Router()
 
-router.post('/register', register)
-router.get('/verify-email', verifyEmail)
+authRouter.post('/register', register)
+authRouter.post('/login', login)
+authRouter.get('/verify-email', verifyEmail)
 
-export default router
+export default authRouter
