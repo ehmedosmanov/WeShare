@@ -1,12 +1,13 @@
+import LoginForm from '@/components/AuthComponents/LoginForm'
 import GridAnimations from '@/components/animate/GridLineAnimation'
 import React from 'react'
+import { Helmet } from 'react-helmet-async'
 
 const Login = () => {
   return (
-    <main>
-      <h1 className='text-4xl bg-black'>LOGIN</h1>
-      <GridAnimations />
-    </main>
+    <>
+      <LoginForm />
+    </>
   )
 }
 

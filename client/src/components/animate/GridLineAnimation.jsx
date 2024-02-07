@@ -2,36 +2,36 @@ import React from 'react'
 import './index.scss'
 const GridAnimations = () => {
   return (
-    <div class='grid-lines overflow-hidden'>
-      <div class='lines'>
-        <div class='line'></div>
-        <div class='line'></div>
-        <div class='line'></div>
-        <div class='line'></div>
-        <div class='line'></div>
-        <div class='line'></div>
-        <div class='line'></div>
-        <div class='line'></div>
-        <div class='line'></div>
-        <div class='line'></div>
-        <div class='line'></div>
-        <div class='line'></div>
-        <div class='line'></div>
-        <div class='line'></div>
-        <div class='line'></div>
-        <div class='line'></div>
+    <div className='grid-lines overflow-hidden'>
+      <div className='lines'>
+        <div className="line after:content-[''] after:bg-gradient dark:after:bg-darkGradient bg-gray-200 dark:bg-gray-800"></div>
+        <div className="line after:content-[''] after:bg-gradient dark:after:bg-darkGradient bg-gray-200 dark:bg-gray-800"></div>
+        <div className="line after:content-[''] after:bg-gradient dark:after:bg-darkGradient bg-gray-200 dark:bg-gray-800"></div>
+        <div className="line after:content-[''] after:bg-gradient dark:after:bg-darkGradient bg-gray-200 dark:bg-gray-800"></div>
+        <div className="line after:content-[''] after:bg-gradient dark:after:bg-darkGradient bg-gray-200 dark:bg-gray-800"></div>
+        <div className="line after:content-[''] after:bg-gradient dark:after:bg-darkGradient bg-gray-200 dark:bg-gray-800"></div>
+        <div className="line after:content-[''] after:bg-gradient dark:after:bg-darkGradient bg-gray-200 dark:bg-gray-800"></div>
+        <div className="line after:content-[''] after:bg-gradient dark:after:bg-darkGradient bg-gray-200 dark:bg-gray-800"></div>
+        <div className="line after:content-[''] after:bg-gradient dark:after:bg-darkGradient bg-gray-200 dark:bg-gray-800"></div>
+        <div className="line after:content-[''] after:bg-gradient dark:after:bg-darkGradient bg-gray-200 dark:bg-gray-800"></div>
+        <div className="line after:content-[''] after:bg-gradient dark:after:bg-darkGradient bg-gray-200 dark:bg-gray-800"></div>
+        <div className="line after:content-[''] after:bg-gradient dark:after:bg-darkGradient bg-gray-200 dark:bg-gray-800"></div>
+        <div className="line after:content-[''] after:bg-gradient dark:after:bg-darkGradient bg-gray-200 dark:bg-gray-800"></div>
+        <div className="line after:content-[''] after:bg-gradient dark:after:bg-darkGradient bg-gray-200 dark:bg-gray-800"></div>
+        <div className="line after:content-[''] after:bg-gradient dark:after:bg-darkGradient bg-gray-200 dark:bg-gray-800"></div>
+        <div className="line after:content-[''] after:bg-gradient dark:after:bg-darkGradient bg-gray-200 dark:bg-gray-800"></div>
       </div>
-      <div class='lines'>
-        <div class='line-vertical'></div>
-        <div class='line-vertical'></div>
-        <div class='line-vertical'></div>
-        <div class='line-vertical'></div>
-        <div class='line-vertical'></div>
-        <div class='line-vertical'></div>
-        <div class='line-vertical'></div>
-        <div class='line-vertical'></div>
-        <div class='line-vertical'></div>
-        <div class='line-vertical'></div>
+      <div className='lines'>
+        <div className='line-vertical bg-gray-200 dark:bg-gray-800'></div>
+        <div className='line-vertical bg-gray-200 dark:bg-gray-800'></div>
+        <div className='line-vertical bg-gray-200 dark:bg-gray-800'></div>
+        <div className='line-vertical bg-gray-200 dark:bg-gray-800'></div>
+        <div className='line-vertical bg-gray-200 dark:bg-gray-800'></div>
+        <div className='line-vertical bg-gray-200 dark:bg-gray-800'></div>
+        <div className='line-vertical bg-gray-200 dark:bg-gray-800'></div>
+        <div className='line-vertical bg-gray-200 dark:bg-gray-800'></div>
+        <div className='line-vertical bg-gray-200 dark:bg-gray-800'></div>
+        <div className='line-vertical bg-gray-200 dark:bg-gray-800'></div>
       </div>
     </div>
   )

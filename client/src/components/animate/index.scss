@@ -1,27 +1,20 @@
 .lines {
   .line {
     position: absolute;
-    width: 1px;
+    width: 2px;
     height: 100%;
     top: 0;
     left: 0;
-    background: rgba(255, 255, 255, 0.1);
     z-index: -1;
 
     &::after {
       content: '';
       display: block;
       position: absolute;
-      height: 30px;
+      height: 45px;
       width: 100%;
       top: 0%;
       left: 0;
-      background: linear-gradient(
-        to bottom,
-        rgba(255, 217, 0, 0) 0%,
-        #ffd900 75%,
-        #ffd900 100%
-      );
       animation: run 4s 0s infinite linear;
       animation-fill-mode: forwards;
     }
@@ -37,7 +30,7 @@
       }
     }
 
-    @include maxQuery(991) {
+    @media only screen and (max-width: 992px) {
       &:nth-child(2n) {
         display: none;
       }
@@ -50,7 +43,6 @@
     height: 1px;
     top: 0;
     left: 0;
-    background: rgba(255, 255, 255, 0.1);
     z-index: -1;
 
     @for $i from 1 through 10 {
@@ -59,7 +51,7 @@
       }
     }
 
-    @include maxQuery(767) {
+    @media only screen and (max-width: 768px) {
       &:nth-child(2n) {
         display: none;
       }

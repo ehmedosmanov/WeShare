@@ -1,28 +1,133 @@
 import User from '../models/user.model.js'
 import sendMail from '../services/send-email.js'
+import { oauth2Client } from '../helpers/oauth2-client.js'
+import { google } from 'googleapis'
+import crypto from 'crypto'
 import {
   generateAccessToken,
   generateRefreshToken
 } from '../utils/generate-tokens.js'
 import userValidationSchema from '../validators/user-validation.js'
-
+import jwt from 'jsonwebtoken'
+import { loginSchema, registerSchema } from '../validators/auth-validations.js'
 // TODO: ADD OAUTH GOOGLE
-export const login = async (req, res) => {
+
+export const authWithGoogle = async (req, res) => {
   try {
-    const { error } = userValidationSchema.validate(req.body)
-    if (error) {
-      return res.status(400).json({ error: error.details[0].message })
+    const { tokens } = await oauth2Client.getToken(req.query.code)
+    oauth2Client.setCredentials(tokens)
+    const people = google.people({ version: 'v1', auth: oauth2Client })
+    const me = await people.people.get({
+      resourceName: 'people/me',
+      personFields: 'emailAddresses,names'
+    })
+
+    let user = await User.findOne({
+      email: me.data.emailAddresses[0].value
+    })
+    if (!user) {
+      user = new User({
+        firstName: me.data.names[0].givenName,
+        lastName: me.data.names[0].familyName || '',
+        username: `${me.data.names[0].givenName}${
+          me.data.names[0].familyName || ''
+        }`,
+        email: me.data.emailAddresses[0].value,
+        password: crypto.randomBytes(20).toString('hex'),
+        googleId: me.data.resourceName.split('/')[1],
+        verified: true
+      })
+      await user.save()
     }
 
+    const accessToken = generateAccessToken(user)
+    const refreshToken = generateRefreshToken(user)
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: process.env.CLIENT_URL,
+      secure: true,
+      sameSite: 'None',
+      maxAge: 30 * 24 * 60 * 60 * 1000
+    })
+
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      origin: process.env.CLIENT_URL,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      secure: true,
+      sameSite: 'None'
+    })
+
+    res.redirect(process.env.CLIENT_URL)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+export const getOauth = async (req, res) => {
+  try {
+    const url = oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      scope: ['profile', 'email']
+    })
+    res.json({ url })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+export const authStatus = async (req, res) => {
+  try {
+    const currentUser = req.user
+    if (!currentUser) {
+      return res.status(200).json({ isAuthenticated: false })
+    } else {
+      return res.status(200).json({ isAuthenticated: true })
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message })
+  }
+}
+
+let loginAttempts = {}
+
+export const login = async (req, res) => {
+  try {
+    // const { error } = loginSchema.validate(req.body)
+    // if (error) {
+    //   return res.status(400).json({ error: error.details[0].message })
+    // }
+
     const { email, username, password } = req.body
+
+    console.log(req.body)
+
+    if (
+      loginAttempts[username] &&
+      loginAttempts[username].blockUntil > Date.now()
+    ) {
+      return res
+        .status(429)
+        .send('Too many login attempts, please try again later.')
+    }
+
     const user = await User.findOne({
       $or: [{ email: email }, { username: username }]
     })
 
     const isValidPassword = user.checkPassword(password)
     if (!isValidPassword || !user) {
+      if (!loginAttempts[username]) {
+        loginAttempts[username] = { attempts: 0 }
+      }
+      loginAttempts[username].attempts++
+      if (loginAttempts[username].attempts >= 5) {
+        loginAttempts[username].blockUntil = Date.now() + 60000
+      }
       return res.status(400).json({ error: 'Invalid password or Username' })
     }
+
+    loginAttempts[username] = { attempts: 0 }
 
     if (!user.verified) {
       return res.status(403).json({ error: 'Email not verified' })
@@ -44,6 +149,13 @@ export const login = async (req, res) => {
     const accessToken = generateAccessToken(user)
     const refreshToken = generateRefreshToken(user)
 
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      secure: true,
+      sameSite: 'None'
+    })
+
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -59,7 +171,7 @@ export const login = async (req, res) => {
 
 export const register = async (req, res) => {
   try {
-    const { error } = userValidationSchema.validate(req.body)
+    const { error } = registerSchema.validate(req.body)
     if (error) {
       return res.status(400).json({ error: error.details[0].message })
     }
@@ -79,42 +191,40 @@ export const register = async (req, res) => {
 
     await newUser.save()
 
-    const accessToken = generateAccessToken(newUser)
-    const refreshToken = generateRefreshToken(newUser)
+    const emailText = `Ay Ogras Ehmed Please click the following link to verify your email: 
+   ${process.env.CLIENT_URL}/Auth/Verified?token=${newUser.emailVerificationToken}`
 
-    res.cookie('refreshToken', refreshToken, {
+    await sendMail(newUser.email, 'Please verify your email', emailText)
+
+    res
+      .status(201)
+      .json({ message: 'Registration successful! Please verify your email.' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+export const refreshAccessToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.cookies
+    if (!refreshToken)
+      return res.status(401).json({ message: 'Refresh Token is MISSING' })
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
+
+    const findUser = await User.findById(decoded.userId)
+    if (!findUser) return res.status(404).json({ message: 'User Not Found' })
+
+    const newToken = generateAccessToken(findUser)
+    res.cookie('accessToken', newToken, {
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
       secure: true,
       sameSite: 'None'
     })
 
-    const emailText = `Please click the following link to verify your email: 
-    ${process.env.CLIENT_URL}/api/verify-email?token=${newUser.emailVerificationToken}`
-    await sendMail(newUser.email, 'Please verify your email', emailText)
-
-    res.status(201).json({ token: accessToken })
-  } catch (error) {
-    res.status(500).json({ message: error.message })
-  }
-}
-
-export const refreshToken = async (req, res) => {
-  try {
-    const refreshToken = req.cookies.refreshToken
-    if (!refreshToken)
-      return res.status(401).json({ message: 'Refresh Token is MISSING' })
-    console.log('sa', refreshToken)
-    const decoded = jwt.verify(refreshToken, process.env.RESET_TOKEN_SECRET)
-
-    const findUser = await User.findById(decoded.userId)
-    if (!findUser) return res.status(404).json({ message: 'User Not Found' })
-
-    const newToken = generateAccessToken(findUser)
-    console.log('NEW', newToken)
     res.status(200).json({ token: newToken })
   } catch (error) {
-    res.status(401).json({ message: error.message })
+    res.status(500).json({ message: error.message })
   }
 }
 
@@ -127,7 +237,7 @@ export const forgotPassword = async (req, res) => {
     user.generatePasswordResetToken()
     await user.save()
     if (user.resetPasswordExpires < Date.now())
-      return res.status(401).json({ message: 'Token Time Expired' })
+      return res.status(400).json({ message: 'Token Time Expired' })
     const emailText = `Please click the following link to verify your email for reset password: 
     ${process.env.CLIENT_URL}/api/reset-password?token=${user.resetPasswordToken}`
     await sendMail(user.email, 'Please verify your email', emailText)
@@ -157,15 +267,33 @@ export const resetPassword = async (req, res) => {
 
 export const verifyEmail = async (req, res) => {
   try {
-    console.log(req.query.token)
-    const user = await User.findOne({ emailVerificationToken: req.query.token })
+    const { token } = req.query
+    const user = await User.findOne({ emailVerificationToken: token })
     if (!user) {
       return res.status(400).json({ message: 'Invalid token.' })
     }
+
     user.verified = true
     user.emailVerificationToken = undefined
     await user.save()
-    res.redirect(process.env.CLIENT_URL + '/')
+
+    const accessToken = generateAccessToken(user)
+    const refreshToken = generateRefreshToken(user)
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      secure: true,
+      sameSite: 'None'
+    })
+
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      secure: true,
+      sameSite: 'None'
+    })
+    res.status(200).json({ message: 'Account confirmed' })
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
@@ -194,3 +322,27 @@ export const logout = async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 }
+
+// class CoffeShop {
+//   constructor(name, capacity) {
+//     this.name = name;
+//     this.capacity = capacity;
+//   }
+
+//   getName() {
+//     return this.name;
+//   }
+
+//   getAddress() {
+
+//     return 'Yeni gunesli coffesi';
+//   }
+
+//   getCapacity() {
+//     return this.capacity;
+//   }
+// }
+
+// const myCoffeeShop = new CoffeShop('Capucinooooooooo', 3169);
+// console.log('Name:', myCoffeeShop.getName());
+// console.log('Capacity:', myCoffeeShop.getCapacity());

@@ -1,12 +1,27 @@
-import React, { useState } from 'react'
+import LoadingScreen from '@/components/Common/LoadingScreen'
+import { useIsAuth } from '@/hooks/AuthHooks'
+import React, { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { toast } from 'sonner'
-const PrivateRoute = ({ component: Component, authenticated, ...rest }) => {
+const PrivateRoute = ({ component: Component, publicOnly, ...rest }) => {
   //TODO: Auth Logic
-  //   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const isAuthenticated = false
-  if (!isAuthenticated) {
-    toast.error('Event has been created.')
+
+  const { data, isLoading, isSuccess } = useIsAuth()
+  console.log(data)
+
+  if (isLoading) {
+    return <LoadingScreen />
+  }
+
+  const isAuthenticated = data?.isAuthenticated
+
+  if (publicOnly && isAuthenticated) {
+    toast.info('You are already authenticated.')
+    return <Navigate to='/' replace />
+  }
+
+  if (!publicOnly && !isAuthenticated) {
+    toast.error('Ay blet User is not authenticated')
     return <Navigate to='/auth/login' replace />
   }
 

@@ -26,14 +26,11 @@ const userValidationSchema = Joi.object({
     .message('Password must not exceed 14 characters')
     .required()
     .pattern(
-      new RegExp(
-        '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,14}$'
-      )
+      new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[a-zA-Z0-9!@#$%^&*]{8,14}$')
     )
     .message(
       'Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character'
     ),
-
   avatar: Joi.string().trim().uri(),
   cover: Joi.string().trim().uri(),
   status: Joi.string().valid('Online', 'Offline'),
@@ -41,15 +38,7 @@ const userValidationSchema = Joi.object({
   gender: Joi.string(),
   birthYear: Joi.number().integer().min(1900).max(new Date().getFullYear()),
   birthMonth: Joi.number().integer().min(1).max(12),
-  birthDay: Joi.number().integer().min(1).max(31),
-  resetPasswordToken: Joi.string(),
-  resetPasswordExpires: Joi.date(),
-  emailVerificationToken: Joi.string(),
-  emailVerificationExpires: Joi.date(),
-  forgetPasswordToken: Joi.string(),
-  forgetPasswordExpires: Joi.date(),
-  otpCode: Joi.string(),
-  otpCodeExpires: Joi.date()
+  birthDay: Joi.number().integer().min(1).max(31)
 })
 
 export default userValidationSchema
