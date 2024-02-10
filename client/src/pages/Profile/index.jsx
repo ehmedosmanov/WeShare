@@ -1,3 +1,5 @@
+import UserPosts from '@/components/ProfileComponents/UserPosts'
+import UserProfileHeading from '@/components/ProfileComponents/UserProfileHeading'
 import React from 'react'
 import { Helmet } from 'react-helmet-async'
 
@@ -7,9 +9,8 @@ const Profile = () => {
       <Helmet>
         <title>Hello World</title>
       </Helmet>
-      <main>
-        <h1 className='text-3xl'> Hello Profile</h1>
-      </main>
+      <UserProfileHeading />
+      <UserPosts />
     </>
   )
 }

@@ -1,12 +1,18 @@
-import { api } from '@/services/api'
+// import { api } from '@/services/api'
 import { create } from 'zustand'
-import { toast } from 'sonner'
-import { useQuery } from '@tanstack/react-query'
-import { authStatus } from '@/services/auth-service'
+// import { toast } from 'sonner'
+// import { useQuery } from '@tanstack/react-query'
+// import { authStatus } from '@/services/auth-service'
 
-// const useAuth = create(set => ({
+const useOpenSearch = create(set => ({
+  open: false,
+  setOpen: () => set(state => ({ open: !state.open }))
+}))
+
+export default useOpenSearch
+
+// const useCurrentUser = create(set => ({
 //   isAuthenticated: false,
-//   accessToken: null,
 //   loading: true,
 //   error: null,
 //   checkAuthentication: async () => {
@@ -35,4 +41,4 @@ import { authStatus } from '@/services/auth-service'
 //   }
 // }))
 
-// export default useAuth
+// export default useCurrentUser

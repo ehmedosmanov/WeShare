@@ -15,7 +15,7 @@ app.use(
   })
 )
 app.use(cookieParser())
-app.use(bodyParser.json())
+app.use(express.json())
 
 app.use('/api', authRouter)
 app.use('/api', postRouter)

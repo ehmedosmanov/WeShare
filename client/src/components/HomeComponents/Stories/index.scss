@@ -1,0 +1,26 @@
+.swiper {
+  width: 800px;
+  height: 100%;
+}
+
+.border-linear {
+  background: #7b4397;
+  background: -webkit-linear-gradient(to right, #7b4397, #dc2430);
+  background: linear-gradient(to right, #7b4397, #dc2430);
+}
+
+.swiper-slide {
+  cursor: pointer;
+  text-align: center;
+  font-size: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.swiper-slide img {
+  display: block;
+  width: 100px;
+  height: 100%;
+  object-fit: contain;
+}

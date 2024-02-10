@@ -13,7 +13,7 @@ const PrivateRoute = ({ component: Component, publicOnly, ...rest }) => {
     return <LoadingScreen />
   }
 
-  const isAuthenticated = data?.isAuthenticated
+  const isAuthenticated = data?.isAuthenticated ?? false
 
   if (publicOnly && isAuthenticated) {
     toast.info('You are already authenticated.')
@@ -21,7 +21,7 @@ const PrivateRoute = ({ component: Component, publicOnly, ...rest }) => {
   }
 
   if (!publicOnly && !isAuthenticated) {
-    toast.error('Ay blet User is not authenticated')
+    toast.error('User is not authenticated')
     return <Navigate to='/auth/login' replace />
   }
 

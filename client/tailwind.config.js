@@ -21,7 +21,9 @@ module.exports = {
         gradient:
           'linear-gradient(to bottom, rgba(255, 217, 0, 0) 0%, #000 75%, #000 100%)',
         darkGradient:
-          'linear-gradient(to bottom, rgba(255, 217, 0, 0) 0%, #fff 75%, #fff 100%)'
+          'linear-gradient(to bottom, rgba(255, 217, 0, 0) 0%, #fff 75%, #fff 100%)',
+        followGradient:
+          'linear-gradient(90deg, hsla(221, 45%, 73%, 1) 0%, hsla(220, 78%, 29%, 1) 100%)'
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -56,6 +58,9 @@ module.exports = {
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))'
+        },
+        follow: {
+          DEFAULT: 'hsl(var(--follow))'
         }
       },
       borderRadius: {

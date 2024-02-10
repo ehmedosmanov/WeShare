@@ -5,11 +5,10 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { toast } from 'sonner'
 
 export const useRegister = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: data => authRegister(data),
     mutationKey: ['register'],
-    onError: (err, previousValue, variables) => {
+    onError: err => {
       console.log('insAllah consoleda gorsenerse', err)
       if (err.response) {
         const { data } = err.response
@@ -24,29 +23,20 @@ export const useRegister = () => {
         console.error('Register error BURDA:', err)
         toast.error('Failed to connect to the server. Please try again later.')
       }
-      queryClient.setQueryData(['me'], previousValue)
     },
     onSuccess: () => {
       toast.success(
         'Registration successful! Please go to verify your registration from email address'
       )
-    },
-    onMutate: async newUser => {
-      await queryClient.cancelQueries(['me'])
-      const previousValue = queryClient.getQueryData(['me'])
-      queryClient.setQueryData(['me'], newUser)
-      return previousValue
-    },
-    onSettled: () => {}
+    }
   })
 }
 
 export const useLogin = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: data => authLogin(data),
     mutationKey: ['login'],
-    onError: (err, previousValue) => {
+    onError: err => {
       if (err.response) {
         const { error } = err.response.data
         if (error === 'Invalid password or Username') {
@@ -64,27 +54,9 @@ export const useLogin = () => {
         console.error('Register error BURDA:', err)
         toast.error('Failed to connect to the server. Please try again later.')
       }
-      queryClient.setQueryData(['me'], previousUser)
     },
     onSuccess: () => {
       toast.success('Welcome back!')
-      queryClient.invalidateQueries(['me', 'users'])
-    }
-  })
-}
-
-export const useVerifyEmail = () => {
-  const location = useLocation()
-  const token = new URLSearchParams(location.search).get('token')
-  return useQuery({
-    queryFn: () => api.get(`/auth/verify-email?token=${token}`),
-    queryKey: ['verifyEmail'],
-    enabled: !!token,
-    onSuccess: data => {
-      toast.success('Account successfully registered')
-    },
-    onError: error => {
-      toast.error(`Verification failed verify errori: ${error.message}`)
     }
   })
 }
@@ -104,6 +76,22 @@ export const useIsAuth = () => {
       if (err) {
         toast.error('is auth erroru:', err.message)
       }
+    }
+  })
+}
+
+export const useVerifyEmail = () => {
+  const location = useLocation()
+  const token = new URLSearchParams(location.search).get('token')
+  return useQuery({
+    queryFn: () => api.get(`/auth/verify-email?token=${token}`),
+    queryKey: ['verifyEmail'],
+    enabled: !!token,
+    onSuccess: data => {
+      toast.success('Account successfully registered')
+    },
+    onError: error => {
+      toast.error(`Verification failed verify errori: ${error.message}`)
     }
   })
 }

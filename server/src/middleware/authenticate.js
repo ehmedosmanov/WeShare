@@ -4,9 +4,9 @@ export const authenticate = async (req, res, next) => {
   const { accessToken } = req.cookies
 
   if (!accessToken) {
-    return res
-      .status(401)
-      .json({ message: 'Token is not found', isAuthenticated: false })
+    req.user = null
+    return next()
+    // return res.send({ isAuthenticated: false })
   }
   try {
     const user = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)

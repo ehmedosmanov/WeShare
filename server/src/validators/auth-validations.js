@@ -58,14 +58,6 @@ export const loginSchema = Joi.object({
       'string.empty': 'Email is required',
       'any.required': 'Email is required'
     }),
-  email: Joi.string()
-    .email({ tlds: { allow: false } })
-    .required()
-    .messages({
-      'string.email': 'Please enter a valid email address',
-      'string.empty': 'Email is required',
-      'any.required': 'Email is required'
-    }),
   username: Joi.string().alphanum().min(3).max(30).required().messages({
     'string.alphanum': 'Username must be alphanumeric',
     'string.min': 'Username must be at least {#limit} characters long',

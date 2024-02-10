@@ -19,18 +19,22 @@ export const authWithGoogle = async (req, res) => {
     const people = google.people({ version: 'v1', auth: oauth2Client })
     const me = await people.people.get({
       resourceName: 'people/me',
-      personFields: 'emailAddresses,names'
+      personFields: 'emailAddresses,names,photos'
     })
 
     let user = await User.findOne({
       email: me.data.emailAddresses[0].value
     })
     if (!user) {
+      const avatarUrl = me.data.photos
+        ? me.data.photos.url
+        : 'default-avatar-url'
       user = new User({
+        avatar: avatarUrl,
         firstName: me.data.names[0].givenName,
-        lastName: me.data.names[0].familyName || '',
+        lastName: me.data.names[0].familyName || ' ',
         username: `${me.data.names[0].givenName}${
-          me.data.names[0].familyName || ''
+          me.data.names[0].familyName || ' '
         }`,
         email: me.data.emailAddresses[0].value,
         password: crypto.randomBytes(20).toString('hex'),
@@ -44,7 +48,8 @@ export const authWithGoogle = async (req, res) => {
     const refreshToken = generateRefreshToken(user)
 
     res.cookie('refreshToken', refreshToken, {
-      httpOnly: process.env.CLIENT_URL,
+      httpOnly: true,
+      origin: process.env.CLIENT_URL,
       secure: true,
       sameSite: 'None',
       maxAge: 30 * 24 * 60 * 60 * 1000
@@ -191,7 +196,7 @@ export const register = async (req, res) => {
 
     await newUser.save()
 
-    const emailText = `Ay Ogras Ehmed Please click the following link to verify your email: 
+    const emailText = `Please click the following link to verify your email: 
    ${process.env.CLIENT_URL}/Auth/Verified?token=${newUser.emailVerificationToken}`
 
     await sendMail(newUser.email, 'Please verify your email', emailText)
@@ -322,27 +327,3 @@ export const logout = async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 }
-
-// class CoffeShop {
-//   constructor(name, capacity) {
-//     this.name = name;
-//     this.capacity = capacity;
-//   }
-
-//   getName() {
-//     return this.name;
-//   }
-
-//   getAddress() {
-
-//     return 'Yeni gunesli coffesi';
-//   }
-
-//   getCapacity() {
-//     return this.capacity;
-//   }
-// }
-
-// const myCoffeeShop = new CoffeShop('Capucinooooooooo', 3169);
-// console.log('Name:', myCoffeeShop.getName());
-// console.log('Capacity:', myCoffeeShop.getCapacity());

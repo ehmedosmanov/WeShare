@@ -8,7 +8,7 @@ const { Schema, model } = mongoose
 const userSchema = new Schema(
   {
     firstName: { type: String, required: true, trim: true, text: true },
-    lastName: { type: String, required: true, trim: true, text: true },
+    lastName: { type: String, trim: true, text: true },
     username: {
       type: String,
       required: true,
@@ -43,11 +43,10 @@ const userSchema = new Schema(
       enum: ['Online', 'Offline'],
       default: 'Offline'
     },
+    bio: { type: String },
+
     twoFactorEnabled: { type: Boolean, default: false },
     gender: { type: String },
-    birthYear: { type: Number, trim: true },
-    birthMonth: { type: Number, trim: true },
-    birthDay: { type: Number, trim: true },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
     emailVerificationToken: { type: String },
@@ -63,23 +62,7 @@ const userSchema = new Schema(
     posts: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
     likes: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
     comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
-    messagesSent: [{ type: Schema.Types.ObjectId, ref: 'Message' }],
-    messagesReceived: [{ type: Schema.Types.ObjectId, ref: 'Message' }],
-    groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }],
-    eventsCreated: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
-    eventsParticipated: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
-    reels: [{ type: Schema.Types.ObjectId, ref: 'Reel' }],
-    videos: [{ type: Schema.Types.ObjectId, ref: 'Video' }],
-    music: [{ type: Schema.Types.ObjectId, ref: 'Music' }],
-    groupChats: [{ type: Schema.Types.ObjectId, ref: 'GroupChat' }],
-    videoCalls: [{ type: Schema.Types.ObjectId, ref: 'VideoCall' }],
     blockedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    oneToOneVideoCalls: [
-      { type: Schema.Types.ObjectId, ref: 'OneToOneVideoCall' }
-    ],
-    voiceCalls: [{ type: Schema.Types.ObjectId, ref: 'VoiceCall' }],
-    voiceMessages: [{ type: Schema.Types.ObjectId, ref: 'VoiceMessage' }],
-    playlists: [{ type: Schema.Types.ObjectId, ref: 'Playlist' }],
     NotifyMeSettings: {
       someoneSentMeAMessage: { type: Boolean, default: true },
       someoneLikedMyPhoto: { type: Boolean, default: true },
@@ -89,8 +72,8 @@ const userSchema = new Schema(
       someoneMentionedMe: { type: Boolean, default: true },
       someoneSentMeFollowRequest: { type: Boolean, default: true }
     },
-    searchHistory: [{ type: String }],
-    details: { type: Schema.Types.Mixed },
+    privateProfile: { type: Boolean, default: false },
+    searchHistory: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     savedPosts: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
     marks: [{ type: Schema.Types.ObjectId, ref: 'Mark' }],
     googleId: { type: String },

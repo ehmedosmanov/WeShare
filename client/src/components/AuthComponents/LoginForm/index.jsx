@@ -22,7 +22,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { useNavigate } from 'react-router-dom'
 import { api } from '@/services/api'
-
+import Logo from '@/assets/share-2.png'
 const FormSchema = z.object({
   username: z.string(),
   password: z.string(),
@@ -72,7 +72,7 @@ const LoginForm = () => {
                 <LazyLoadImage
                   className='w-full'
                   alt='WeShareLogo'
-                  src='https://img.icons8.com/ios/250/000000/share-2.png'
+                  src={Logo}
                 />
               </div>
               <h3 className='text-lg pt-4 pb-3 lg:text-2xl text-center font-bold'>
