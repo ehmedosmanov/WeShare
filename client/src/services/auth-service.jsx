@@ -31,6 +31,7 @@ export const authRegister = async data => {
     const response = await api.post('/auth/register', data)
     return response.data
   } catch (error) {
+    console.log(error)
     throw error
   }
 }
@@ -40,6 +41,7 @@ export const authLogin = async data => {
     const response = await api.post('/auth/login', data)
     return response.data
   } catch (error) {
+    console.log(error.message)
     throw error
   }
 }
@@ -50,6 +52,7 @@ export const authStatus = async () => {
     const data = res.data
     return data
   } catch (error) {
-    console.log('authStatus error: ' + error.message)
+    console.log(error.message)
+    throw error
   }
 }

@@ -22,6 +22,7 @@ const VerifiedPage = Loadable(
 )
 const Home = Loadable(lazy(() => import('@/pages/Home')))
 const Profile = Loadable(lazy(() => import('@/pages/Profile')))
+const Settings = Loadable(lazy(() => import('@/pages/SettingsProfile')))
 export const routes = createBrowserRouter([
   {
     path: '/Auth',
@@ -46,7 +47,8 @@ export const routes = createBrowserRouter([
     element: <MainLayout />,
     children: [
       { index: true, element: <PrivateRoute component={Home} /> },
-      { path: 'Profile/:id', element: <PrivateRoute component={Profile} /> }
+      { path: 'Profile/:id', element: <PrivateRoute component={Profile} /> },
+      { path: 'settings', element: <PrivateRoute component={Settings} /> }
     ]
   }
 ])

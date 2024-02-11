@@ -44,7 +44,6 @@ const userSchema = new Schema(
       default: 'Offline'
     },
     bio: { type: String },
-
     twoFactorEnabled: { type: Boolean, default: false },
     gender: { type: String },
     resetPasswordToken: { type: String },

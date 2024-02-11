@@ -4,6 +4,7 @@ import { useGetMe } from '@/hooks/UsersHooks'
 import { api } from '@/services/api'
 import MainPage from '@/components/HomeComponents/MainPage'
 import Stories from '@/components/HomeComponents/Stories'
+import { LazyLoadComponent } from 'react-lazy-load-image-component'
 const Home = () => {
   // const { data: userMe, isLoading } = useGetMe()
 
@@ -13,7 +14,9 @@ const Home = () => {
         <title>Feed</title>
       </Helmet>
       {/* <Stories /> */}
-      <MainPage />
+      <LazyLoadComponent>
+        <MainPage />
+      </LazyLoadComponent>
     </>
   )
 }

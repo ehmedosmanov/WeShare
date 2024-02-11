@@ -9,7 +9,7 @@ import {
 } from '../utils/generate-tokens.js'
 import userValidationSchema from '../validators/user-validation.js'
 import jwt from 'jsonwebtoken'
-import { loginSchema, registerSchema } from '../validators/auth-validations.js'
+import { registerSchema } from '../validators/auth-validations.js'
 // TODO: ADD OAUTH GOOGLE
 
 export const authWithGoogle = async (req, res) => {
@@ -21,6 +21,8 @@ export const authWithGoogle = async (req, res) => {
       resourceName: 'people/me',
       personFields: 'emailAddresses,names,photos'
     })
+
+    console.log(me)
 
     let user = await User.findOne({
       email: me.data.emailAddresses[0].value
@@ -176,10 +178,10 @@ export const login = async (req, res) => {
 
 export const register = async (req, res) => {
   try {
-    const { error } = registerSchema.validate(req.body)
-    if (error) {
-      return res.status(400).json({ error: error.details[0].message })
-    }
+    // const { error } = registerSchema.validate(req.body)
+    // if (error) {
+    //   return res.status(400).json({ error: error.details[0].message })
+    // }
     const { firstName, lastName, username, password, email } = req.body
     const userExist = await User.findOne({ email: email })
     if (userExist)

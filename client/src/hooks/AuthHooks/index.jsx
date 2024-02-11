@@ -8,19 +8,10 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: data => authRegister(data),
     mutationKey: ['register'],
-    onError: err => {
-      console.log('insAllah consoleda gorsenerse', err)
-      if (err.response) {
-        const { data } = err.response
-        if (data.error === 'User Already Exist') {
-          toast.error('User with this email or username already exists.')
-        } else {
-          toast.error(
-            'An error occurred during registration. Please try again.'
-          )
-        }
+    onError: error => {
+      if (error) {
+        toast.error(error.response.data.message)
       } else {
-        console.error('Register error BURDA:', err)
         toast.error('Failed to connect to the server. Please try again later.')
       }
     },
@@ -36,22 +27,10 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: data => authLogin(data),
     mutationKey: ['login'],
-    onError: err => {
-      if (err.response) {
-        const { error } = err.response.data
-        if (error === 'Invalid password or Username') {
-          toast.error('Invalid username or password.')
-        } else if (error === 'Email not verified') {
-          toast.error('Email not verified.')
-        } else if (
-          error === 'Too many login attempts, please try again later.'
-        ) {
-          toast.error('Too many login attempts, please try again later.')
-        } else {
-          toast.error('An error occurred during login. Please try again.')
-        }
+    onError: error => {
+      if (error) {
+        toast.error(error.response.data.message)
       } else {
-        console.error('Register error BURDA:', err)
         toast.error('Failed to connect to the server. Please try again later.')
       }
     },

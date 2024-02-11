@@ -1,16 +1,21 @@
 import UserPosts from '@/components/ProfileComponents/UserPosts'
 import UserProfileHeading from '@/components/ProfileComponents/UserProfileHeading'
-import React from 'react'
+import React, { lazy } from 'react'
 import { Helmet } from 'react-helmet-async'
+import { LazyLoadComponent } from 'react-lazy-load-image-component'
 
 const Profile = () => {
   return (
     <>
       <Helmet>
-        <title>Hello World</title>
+        <title>Profile </title>
       </Helmet>
-      <UserProfileHeading />
-      <UserPosts />
+      <LazyLoadComponent>
+        <UserProfileHeading />
+      </LazyLoadComponent>
+      <LazyLoadComponent>
+        <UserPosts />
+      </LazyLoadComponent>
     </>
   )
 }

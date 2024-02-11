@@ -68,23 +68,6 @@ export const getUsers = async (req, res) => {
   }
 }
 
-export const getUserProfile = async (req, res) => {
-  try {
-    const { id } = req.params
-
-    const findUser = await User.findById(id).populate(
-      'followers following posts'
-    )
-    if (!findUser) {
-      return res.status(404).json({ message: 'User not found' })
-    }
-
-    res.json(findUser)
-  } catch (error) {
-    res.status(500).json({ message: error.message })
-  }
-}
-
 export const searchHistory = async (req, res) => {
   try {
     const currentUser = req.user
@@ -167,7 +150,7 @@ export const followUser = async (req, res) => {
     console.log('Follow Eden', currentUser.userId)
 
     if (id === currentUser.userId) {
-      return res.status(403).json({ message: 'Use cant follow yourself' })
+      return res.status(403).json({ message: 'You cant follow yourself' })
     }
 
     await User.findByIdAndUpdate(
@@ -194,30 +177,40 @@ export const followUser = async (req, res) => {
 export const unFollowUser = async (req, res) => {
   try {
     const { id } = req.body
-    const currentUser = req.user
+    const { userId } = req.user
+
+    if (id === userId) {
+      return res.status(403).json({ message: 'You cant unfollow yourself' })
+    }
 
     const followedUser = await User.findById(id)
 
     if (!followedUser)
       return res.status(404).json({ message: 'User not found' })
 
+    console.log('istifadeci unfollow eden', userId)
+    console.log('unfollow olunan', id)
+
+    //Follow eden userin followedler update olunur
     await User.findByIdAndUpdate(
-      currentUser._id,
+      userId,
       {
-        $pull: { following: id }
+        $pull: { following: followedUser._id }
       },
       {
         new: true
       }
     )
 
+    //Follow olunan userin followersleri update olunur
     await User.findByIdAndUpdate(
       followedUser._id,
       {
-        $pull: { followers: id }
+        $pull: { followers: userId }
       },
       { new: true }
     )
+    res.status(200).json({ message: 'User unfollowed successfully' })
   } catch (error) {
     res.status(500).json({ message: error.message })
   }

@@ -5,7 +5,8 @@ const userValidationSchema = Joi.object({
     .pattern(/^[a-zA-Z]+$/)
     .message('Please enter only letters')
     .trim()
-    .required(),
+    .required()
+    .messages({}),
   lastName: Joi.string()
     .pattern(/^[a-zA-Z]+$/)
     .message('Please enter only letters')
