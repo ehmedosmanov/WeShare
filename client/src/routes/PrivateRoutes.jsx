@@ -6,11 +6,16 @@ import { toast } from 'sonner'
 const PrivateRoute = ({ component: Component, publicOnly, ...rest }) => {
   //TODO: Auth Logic
 
-  const { data, isLoading, isSuccess } = useIsAuth()
+  const { data, isLoading, isSuccess, isError } = useIsAuth()
   console.log(data)
 
   if (isLoading) {
     return <LoadingScreen />
+  }
+
+  if (isError) {
+    toast.error('An error occurred while checking authentication status')
+    return <Navigate to='/error' replace />
   }
 
   const isAuthenticated = data?.isAuthenticated ?? false

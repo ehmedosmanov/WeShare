@@ -28,9 +28,11 @@ import {
 import { useGetMe } from '@/hooks/UsersHooks'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Link } from 'react-router-dom'
+import { useLogOut } from '@/hooks/AuthHooks'
 
 const UserDropdown = () => {
   const { data: currentUser, isLoading, isError, isSuccess } = useGetMe()
+  const { mutate } = useLogOut()
 
   const fallBack =
     currentUser?.firstName?.charAt(0) + currentUser?.lastName?.charAt(0)
@@ -67,7 +69,7 @@ const UserDropdown = () => {
           </DropdownMenuGroup>
 
           <DropdownMenuSeparator /> */}
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={mutate}>
             <LogOut className='mr-2 h-4 w-4' />
             <span>Log out</span>
           </DropdownMenuItem>

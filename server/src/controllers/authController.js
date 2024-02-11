@@ -96,8 +96,6 @@ export const authStatus = async (req, res) => {
   }
 }
 
-let loginAttempts = {}
-
 export const login = async (req, res) => {
   try {
     // const { error } = loginSchema.validate(req.body)
@@ -105,36 +103,22 @@ export const login = async (req, res) => {
     //   return res.status(400).json({ error: error.details[0].message })
     // }
 
-    const { email, username, password } = req.body
+    const { username, password } = req.body
 
     console.log(req.body)
 
-    if (
-      loginAttempts[username] &&
-      loginAttempts[username].blockUntil > Date.now()
-    ) {
-      return res
-        .status(429)
-        .send('Too many login attempts, please try again later.')
-    }
-
     const user = await User.findOne({
-      $or: [{ email: email }, { username: username }]
+      $or: [{ email: username }, { username: username }]
     })
+
+    console.log(user)
+
+    if (!user) return res.status(404).json({ message: 'User not found' })
 
     const isValidPassword = user.checkPassword(password)
     if (!isValidPassword || !user) {
-      if (!loginAttempts[username]) {
-        loginAttempts[username] = { attempts: 0 }
-      }
-      loginAttempts[username].attempts++
-      if (loginAttempts[username].attempts >= 5) {
-        loginAttempts[username].blockUntil = Date.now() + 60000
-      }
       return res.status(400).json({ error: 'Invalid password or Username' })
     }
-
-    loginAttempts[username] = { attempts: 0 }
 
     if (!user.verified) {
       return res.status(403).json({ error: 'Email not verified' })
@@ -144,8 +128,8 @@ export const login = async (req, res) => {
       user.generateOtpToken()
       await user.save()
       const emailText = `This is your otp code : 
-      ${user.otpCode}
-    `
+        ${user.otpCode}
+      `
       await sendMail(user.email, 'Please verify your code', emailText)
       console.log(user.otpCode)
       return res
@@ -170,7 +154,7 @@ export const login = async (req, res) => {
       sameSite: 'None'
     })
 
-    res.status(200).json({ token: accessToken })
+    res.status(200).json({ message: 'Welcome Back!' })
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
@@ -183,7 +167,9 @@ export const register = async (req, res) => {
     //   return res.status(400).json({ error: error.details[0].message })
     // }
     const { firstName, lastName, username, password, email } = req.body
-    const userExist = await User.findOne({ email: email })
+    const userExist = await User.findOne({
+      $or: [{ email: email }, { username: username }]
+    })
     if (userExist)
       return res.status(409).json({ message: 'User Already Exist' })
 
@@ -275,6 +261,7 @@ export const resetPassword = async (req, res) => {
 export const verifyEmail = async (req, res) => {
   try {
     const { token } = req.query
+    console.log(token)
     const user = await User.findOne({ emailVerificationToken: token })
     if (!user) {
       return res.status(400).json({ message: 'Invalid token.' })
@@ -323,6 +310,7 @@ export const verifyOtp = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
+    res.clearCookie('accessToken')
     res.clearCookie('refreshToken')
     res.json({ message: 'Logout successful' })
   } catch (error) {

@@ -1,6 +1,12 @@
 import { api } from '@/services/api'
-import { authRegister, authLogin, authStatus } from '@/services/auth-service'
+import {
+  authRegister,
+  authLogin,
+  authStatus,
+  authVerify
+} from '@/services/auth-service'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { toast } from 'sonner'
 
@@ -24,17 +30,18 @@ export const useRegister = () => {
 }
 
 export const useLogin = () => {
+  const navigate = useNavigate()
   return useMutation({
     mutationFn: data => authLogin(data),
     mutationKey: ['login'],
     onError: error => {
       if (error) {
-        toast.error(error.response.data.message)
-      } else {
-        toast.error('Failed to connect to the server. Please try again later.')
+        console.log(error)
+        toast.error(error.response.data.error)
       }
     },
     onSuccess: () => {
+      navigate('/')
       toast.success('Welcome back!')
     }
   })
@@ -59,18 +66,16 @@ export const useIsAuth = () => {
   })
 }
 
-export const useVerifyEmail = () => {
-  const location = useLocation()
-  const token = new URLSearchParams(location.search).get('token')
-  return useQuery({
-    queryFn: () => api.get(`/auth/verify-email?token=${token}`),
-    queryKey: ['verifyEmail'],
-    enabled: !!token,
+export const useLogOut = () => {
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => api.post('/auth/logout'),
     onSuccess: data => {
-      toast.success('Account successfully registered')
-    },
-    onError: error => {
-      toast.error(`Verification failed verify errori: ${error.message}`)
+      console.log(data.data.message)
+      navigate('/auth/login')
+      queryClient.invalidateQueries({ queryKey: ['status'] })
+      queryClient.setQueryData(['status'], { isAuthenticated: false })
     }
   })
 }

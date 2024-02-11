@@ -42,15 +42,16 @@ export const changePassword = async (req, res) => {
 
     const findCurrentUser = await User.findById(_id)
 
-    const isValidPassword = findCurrentUser.checkPassword(oldPassword)
+    const isValidPassword = await findCurrentUser.checkPassword(oldPassword)
 
     if (!isValidPassword)
       return res.status(400).json({ message: 'Password is not valid' })
 
+    const hashPassword = await bcrypt.hash(newPassword, 10)
     const findUser = await User.findByIdAndUpdate(
-      _id,
+      findCurrentUser._id,
       {
-        password: newPassword
+        password: hashPassword
       },
       { new: true }
     )

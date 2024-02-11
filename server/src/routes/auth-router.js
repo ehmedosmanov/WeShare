@@ -4,6 +4,7 @@ import {
   authWithGoogle,
   getOauth,
   login,
+  logout,
   refreshAccessToken,
   register,
   verifyEmail
@@ -13,9 +14,10 @@ const authRouter = express.Router()
 
 authRouter.post('/auth/register', register)
 authRouter.post('/auth/login', login)
+authRouter.post('/auth/logout', logout)
 // authRouter.get('/auth/google', getOauth)
 // authRouter.get('/auth/google/callback', authWithGoogle)
-authRouter.get('/auth/verify-email', verifyEmail)
+authRouter.post('/auth/verify-email', verifyEmail)
 // authRouter.get('/auth/getGoogleAuthUrl', getOauth)
 authRouter.get('/auth/google', getOauth)
 authRouter.get('/auth/status', authenticate, authStatus)

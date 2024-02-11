@@ -46,6 +46,16 @@ export const authLogin = async data => {
   }
 }
 
+export const authVerify = async token => {
+  try {
+    const response = await api.post(`/auth/verify-email?token=${token}`)
+    return response.data
+  } catch (error) {
+    console.log(error.message)
+    throw error
+  }
+}
+
 export const authStatus = async () => {
   try {
     const res = await api.get('/auth/status')
