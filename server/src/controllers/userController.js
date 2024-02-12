@@ -219,7 +219,8 @@ export const unFollowUser = async (req, res) => {
 export const getUserFollowers = async (req, res) => {
   try {
     const { id } = req.params
-    const user = await User.findById(id)
+    console.log('Getting', id)
+    const user = await User.findById(id).populate('followers')
     if (!user) return res.status(404).json({ message: 'User not found' })
     res.status(200).json(user.followers)
   } catch (error) {

@@ -1,17 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 import UserProfileSkeleton from './UserProfileSkeleton'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { Link, useParams } from 'react-router-dom'
-import { useGetMe, useGetUserProfile } from '@/hooks/UsersHooks'
+import {
+  useGetMe,
+  useGetUserFollowers,
+  useGetUserProfile
+} from '@/hooks/UsersHooks'
 import { Button } from '@/components/ui/button'
 import FollowBtn from '@/components/Common/FollowBtn'
 import UnFollowBtn from '@/components/Common/UnFollowBtn'
+import { useToggleFollowers } from '@/hooks/use-toggle-followers'
+import UserFollowers from '../UserFollowers'
 
 const UserProfileHeading = () => {
   const { id } = useParams()
   const { data: userProfile, isLoading } = useGetUserProfile(id)
   const { data: currentUser } = useGetMe()
-
+  const { open, setOpen } = useToggleFollowers()
   const isFollowing = currentUser?.following.some(x => x._id === id)
 
   const isCurrentProfile = currentUser?._id === id
@@ -69,7 +75,11 @@ const UserProfileHeading = () => {
                   </span>
                 </li>
                 <li className='flex flex-col gap-y-2 font-bold items-center'>
-                  <h4 className='md:text-base text-xs'>Followers</h4>
+                  <h4
+                    className='md:text-base text-xs cursor-pointer'
+                    onClick={setOpen}>
+                    Followers
+                  </h4>
                   <span className=' text-2xl font-semibold'>
                     {userProfile?.followers.length}
                   </span>
@@ -85,6 +95,7 @@ const UserProfileHeading = () => {
           </div>
         </div>
       </div>
+      <UserFollowers />
     </section>
   )
 }
