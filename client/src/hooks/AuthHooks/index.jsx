@@ -30,7 +30,7 @@ export const useRegister = () => {
 }
 
 export const useLogin = () => {
-  const navigate = useNavigate()
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: data => authLogin(data),
     mutationKey: ['login'],
@@ -41,7 +41,7 @@ export const useLogin = () => {
       }
     },
     onSuccess: () => {
-      navigate('/')
+      queryClient.invalidateQueries({ queryKey: ['status'] })
       toast.success('Welcome back!')
     }
   })

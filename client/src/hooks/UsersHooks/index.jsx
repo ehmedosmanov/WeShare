@@ -7,6 +7,7 @@ import {
   getUserFollowings,
   getUserProfile,
   getUsers,
+  removeFromFollowers,
   saveSearchHistoryUser,
   unfollowUser,
   updateProfile
@@ -127,6 +128,26 @@ export const useUnFollowUser = () => {
     mutationFn: id => unfollowUser(id),
     mutationKey: ['unFollowUser'],
     onSuccess: id => {
+      queryClient.refetchQueries({ queryKey: ['me'] })
+      queryClient.invalidateQueries({ queryKey: ['userFollowers'] })
+      queryClient.invalidateQueries({ queryKey: ['userFollowings'] })
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] })
+      queryClient.invalidateQueries({ queryKey: ['userProfile', id] })
+    },
+    onError: error => {
+      console.log(error)
+      toast.error(error.response.data.message)
+    }
+  })
+}
+
+export const useRemoveFromFollower = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: id => removeFromFollowers(id),
+    mutationKey: ['removeFromFollowers'],
+    onSuccess: id => {
+      console.log(id)
       queryClient.refetchQueries({ queryKey: ['me'] })
       queryClient.invalidateQueries({ queryKey: ['userFollowers'] })
       queryClient.invalidateQueries({ queryKey: ['userFollowings'] })

@@ -1,7 +1,7 @@
 import User from '../models/user.model.js'
 
-// TODO: Change Email
-// TODO: Follow,Unfollow
+// TODO: Change Email--Done
+// TODO: Follow,Unfollow--Done
 // TODO: Private Account, (Account Controller)
 
 export const enableTwoFactorAuthentication = async (req, res) => {
@@ -142,6 +142,32 @@ export const saveSearchHistory = async (req, res) => {
   }
 }
 
+export const removeFromFollowers = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { userId } = req.user
+
+    console.log('MEne gelen id: ', id)
+
+    await User.findByIdAndUpdate(
+      userId,
+      { $pull: { followers: id } },
+      { new: true }
+    )
+
+    await User.findByIdAndUpdate(
+      id,
+      { $pull: { following: userId } },
+      { new: true }
+    )
+
+    res.status(200).json({ message: 'removed from followers successfully' })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: error.message })
+  }
+}
+
 export const followUser = async (req, res) => {
   try {
     const { id } = req.body
@@ -219,7 +245,6 @@ export const unFollowUser = async (req, res) => {
 export const getUserFollowers = async (req, res) => {
   try {
     const { id } = req.params
-    console.log('Getting', id)
     const user = await User.findById(id).populate('followers')
     if (!user) return res.status(404).json({ message: 'User not found' })
     res.status(200).json(user.followers)

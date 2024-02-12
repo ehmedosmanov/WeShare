@@ -7,6 +7,7 @@ import {
   getUserFollowers,
   getUserFollowings,
   getUsers,
+  removeFromFollowers,
   saveSearchHistory,
   searchHistory,
   unFollowUser
@@ -23,5 +24,10 @@ userRouter.post('/user/follow-user', authenticate, followUser)
 userRouter.post('/user/unfollow-user', authenticate, unFollowUser)
 userRouter.get('/user/get-followers/:id', authenticate, getUserFollowers)
 userRouter.get('/user/get-followings/:id', authenticate, getUserFollowings)
+userRouter.delete(
+  '/user/remove-follower/:id',
+  authenticate,
+  removeFromFollowers
+)
 
 export default userRouter

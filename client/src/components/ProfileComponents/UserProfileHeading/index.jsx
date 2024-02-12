@@ -35,10 +35,10 @@ const UserProfileHeading = () => {
   return (
     <section id='user-profile' className=''>
       <div className='profile-heading'>
-        <div className='flex md:flex-row flex-col items-center gap-x-16'>
+        <div className='flex md:flex-row flex-col  gap-x-16'>
           <div className='max-w-[140px] rounded-full'>
             <LazyLoadImage
-              className='w-full rounded-full h-full object-contain'
+              className='w-full rounded-full object-contain'
               alt={userProfile?.username}
               src={userProfile?.avatar}
             />
@@ -70,7 +70,12 @@ const UserProfileHeading = () => {
                 </ul>
               </div>
               <p className='pt-2 lg:text-base md:text-sm text-xs md:text-left text-center'>
-                {userProfile?.bio}
+                {userProfile?.bio?.split('\n').map((item, key) => (
+                  <React.Fragment key={key}>
+                    {item}
+                    <br />
+                  </React.Fragment>
+                ))}
               </p>
             </div>
             <div className='flex  justify-between lg:items-center lg:flex-row flex-col  gap-y-6'>

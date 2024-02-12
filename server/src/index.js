@@ -3,7 +3,6 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import authRouter from './routes/auth-router.js'
 import postRouter from './routes/post-router.js'
-import bodyParser from 'body-parser'
 import userRouter from './routes/user-router.js'
 import profileRouter from './routes/profile-router.js'
 

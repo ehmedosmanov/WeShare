@@ -133,6 +133,20 @@ export const getUserFollowings = async id => {
   }
 }
 
+export const removeFromFollowers = async id => {
+  try {
+    console.log(`Removing ${id} from `)
+    const res = await api.delete(`/user/remove-follower/${id}`)
+    if (!res.data) {
+      throw new Error('No data received from server')
+    }
+    return res.data
+  } catch (error) {
+    console.log(error.message)
+    throw error
+  }
+}
+
 export const changeUserPassword = async data => {
   try {
     console.log(data)
