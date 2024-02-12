@@ -14,7 +14,7 @@ const FollowBtn = ({ id }) => {
             id: id
           })
         }
-        className='text-white flex justify-center items-center px-4 md:px-8 bg-blue-700 hover:bg-blue-700/90 duration-300'>
+        className='text-white flex justify-center items-center px-3 md:px-5 bg-[#40A2D8] hover:bg-[#40A2D8]/40 duration-300'>
         {followPending ? (
           <MoonLoader speedMultiplier={1} size={18} color='#fff' />
         ) : (

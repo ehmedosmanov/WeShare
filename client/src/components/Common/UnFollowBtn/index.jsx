@@ -16,7 +16,7 @@ const UnFollowBtn = ({ id }) => {
             id: id
           })
         }
-        className='text-white flex justify-center items-center px-4 md:px-8 bg-primary/40 hover:bg-primary/30 duration-300'>
+        className='text-white flex justify-center items-center px-3 md:px-5 bg-primary/40 hover:bg-primary/30 duration-300'>
         {unfollowPending ? (
           <MoonLoader speedMultiplier={1} size={18} color='#fff' />
         ) : (

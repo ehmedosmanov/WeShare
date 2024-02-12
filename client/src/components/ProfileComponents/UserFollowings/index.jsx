@@ -1,4 +1,4 @@
-import { useGetUserFollowers } from '@/hooks/UsersHooks'
+import { useGetUserFollowings } from '@/hooks/UsersHooks'
 import { useGetMe } from '@/hooks/UsersHooks'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -11,16 +11,16 @@ import {
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { useParams } from 'react-router-dom'
 import React from 'react'
-import { useToggleFollowers } from '@/hooks/use-toggle-followers'
+import { useToggleFollowings } from '@/hooks/use-toggle-followers'
 import FollowBtn from '@/components/Common/FollowBtn'
 import UnFollowBtn from '@/components/Common/UnFollowBtn'
 
-const UserFollowers = () => {
+const UserFollowings = () => {
   const { id } = useParams()
   const { data: currentUser } = useGetMe()
-  const { data: userFollowers, isLoading } = useGetUserFollowers(id)
+  const { data: userFollowings, isLoading } = useGetUserFollowings(id)
   const [query, setQuery] = useState('')
-  const { open, setOpen } = useToggleFollowers()
+  const { toggle, setToggle } = useToggleFollowings()
 
   // useEffect(() => {
   //   if (query.trim()) {
@@ -37,7 +37,7 @@ const UserFollowers = () => {
 
   return (
     <>
-      <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandDialog open={toggle} onOpenChange={setToggle}>
         <CommandInput
           type='text'
           value={query}
@@ -46,8 +46,8 @@ const UserFollowers = () => {
           className='focus-visible:ring-0 ring-white focus-visible:ring-white border-b border-b-accent'
         />
         <CommandList>
-          {userFollowers.length > 0 ? (
-            userFollowers
+          {userFollowings.length > 0 ? (
+            userFollowings
               .filter(x =>
                 x.username
                   .trim()
@@ -96,4 +96,4 @@ const UserFollowers = () => {
     </>
   )
 }
-export default UserFollowers
+export default UserFollowings

@@ -120,6 +120,19 @@ export const getUserFollowers = async id => {
   }
 }
 
+export const getUserFollowings = async id => {
+  try {
+    const res = await api.get(`/user/get-followings/${id}`)
+    if (!res.data) {
+      throw new Error('No data received from server')
+    }
+    return res.data
+  } catch (error) {
+    console.log(error.message)
+    throw error
+  }
+}
+
 export const changeUserPassword = async data => {
   try {
     console.log(data)

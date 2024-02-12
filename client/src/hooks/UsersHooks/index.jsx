@@ -4,6 +4,7 @@ import {
   getMeUser,
   getSearchHistotyUser,
   getUserFollowers,
+  getUserFollowings,
   getUserProfile,
   getUsers,
   saveSearchHistoryUser,
@@ -76,7 +77,7 @@ export const useGetUserProfile = id => {
   return useQuery({
     queryKey: ['userProfile', id],
     queryFn: () => getUserProfile(id),
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60,
     onSuccess: () => {},
     onError: err => {
       if (err) {
@@ -94,6 +95,14 @@ export const useGetUserFollowers = id => {
   })
 }
 
+export const useGetUserFollowings = id => {
+  return useQuery({
+    queryKey: ['userFollowings', id],
+    queryFn: () => getUserFollowings(id),
+    staleTime: 1000 * 60
+  })
+}
+
 export const useFollowUser = () => {
   const queryClient = useQueryClient()
   return useMutation({
@@ -101,6 +110,8 @@ export const useFollowUser = () => {
     mutationKey: ['followUser'],
     onSuccess: id => {
       queryClient.invalidateQueries({ queryKey: ['me'] })
+      queryClient.invalidateQueries({ queryKey: ['userFollowers'] })
+      queryClient.invalidateQueries({ queryKey: ['userFollowings'] })
       queryClient.invalidateQueries({ queryKey: ['userProfile'] })
       queryClient.invalidateQueries({ queryKey: ['userProfile', id] })
     },
@@ -117,6 +128,8 @@ export const useUnFollowUser = () => {
     mutationKey: ['unFollowUser'],
     onSuccess: id => {
       queryClient.refetchQueries({ queryKey: ['me'] })
+      queryClient.invalidateQueries({ queryKey: ['userFollowers'] })
+      queryClient.invalidateQueries({ queryKey: ['userFollowings'] })
       queryClient.invalidateQueries({ queryKey: ['userProfile'] })
       queryClient.invalidateQueries({ queryKey: ['userProfile', id] })
     },

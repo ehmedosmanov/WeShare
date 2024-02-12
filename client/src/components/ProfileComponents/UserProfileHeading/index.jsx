@@ -10,14 +10,20 @@ import {
 import { Button } from '@/components/ui/button'
 import FollowBtn from '@/components/Common/FollowBtn'
 import UnFollowBtn from '@/components/Common/UnFollowBtn'
-import { useToggleFollowers } from '@/hooks/use-toggle-followers'
+import {
+  useToggleFollowers,
+  useToggleFollowings
+} from '@/hooks/use-toggle-followers'
 import UserFollowers from '../UserFollowers'
+import UserFollowings from '../UserFollowings'
 
 const UserProfileHeading = () => {
   const { id } = useParams()
   const { data: userProfile, isLoading } = useGetUserProfile(id)
   const { data: currentUser } = useGetMe()
-  const { open, setOpen } = useToggleFollowers()
+  const { setOpen } = useToggleFollowers()
+  const { setToggle } = useToggleFollowings()
+
   const isFollowing = currentUser?.following.some(x => x._id === id)
 
   const isCurrentProfile = currentUser?._id === id
@@ -40,10 +46,11 @@ const UserProfileHeading = () => {
           <div className='flex w-full max-w-[85%] lg:max-w-[65%] flex-col gap-y-8'>
             <div>
               <div className='flex justify-between md:flex-row flex-col gap-y-4'>
-                <div className='flex  md:mt-0 mt-2  flex-col md:items-start items-center'>
-                  <h3 className=' font-bold md:text-left text-center text-lg md:text-2xl'>
+                <div className='flex md:mt-0 mt-2  flex-col md:items-start items-center'>
+                  <h3 className='font-bold md:text-left text-center text-lg md:text-[24px]'>
                     {userProfile?.firstName} {userProfile?.lastName}
                   </h3>
+                  <span className='pt-3'>@{userProfile?.username}</span>
                 </div>
                 <ul className='flex justify-center md:justify-start items-center gap-x-2 '>
                   <li>
@@ -62,7 +69,7 @@ const UserProfileHeading = () => {
                   </li>
                 </ul>
               </div>
-              <p className='pt-4 lg:text-base md:text-sm text-xs md:text-left text-center'>
+              <p className='pt-2 lg:text-base md:text-sm text-xs md:text-left text-center'>
                 {userProfile?.bio}
               </p>
             </div>
@@ -85,7 +92,11 @@ const UserProfileHeading = () => {
                   </span>
                 </li>
                 <li className='flex flex-col gap-y-2 font-bold items-center'>
-                  <h4 className='md:text-base text-xs'>Following</h4>
+                  <h4
+                    onClick={setToggle}
+                    className='cursor-pointer md:text-base text-xs'>
+                    Following
+                  </h4>
                   <span className=' text-2xl font-semibold'>
                     {userProfile?.following.length}
                   </span>
@@ -96,6 +107,7 @@ const UserProfileHeading = () => {
         </div>
       </div>
       <UserFollowers />
+      <UserFollowings />
     </section>
   )
 }

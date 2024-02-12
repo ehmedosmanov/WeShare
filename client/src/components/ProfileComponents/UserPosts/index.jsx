@@ -11,36 +11,31 @@ const UserPosts = () => {
           <h3 className='text-3xl font-bold text-primary'>Posts</h3>
         </div>
         <div className='posts py-4 gap-1 grid grid-cols-2 md:grid-cols-3'>
-          <div className='post cursor-pointer  bg-black'>
-            <AspectRatio ratio={1 / 1}>
-              <LazyLoadImage
-                className='w-full h-full object-cover'
-                src='https://demo.foxthemes.net/socialite-v3.0/assets/images/post/img-2.jpg'
-              />
-            </AspectRatio>
-          </div>
-          <div className='post cursor-pointer  bg-black'>
-            <AspectRatio ratio={1 / 1}>
-              <LazyLoadImage
-                className='w-full h-full object-cover'
-                src='https://demo.foxthemes.net/socialite-v3.0/assets/images/post/img-2.jpg'
-              />
-            </AspectRatio>
-          </div>
-          <div className='post cursor-pointer  bg-black'>
-            <AspectRatio ratio={1 / 1}>
-              <LazyLoadImage
-                className='w-full h-full object-cover'
-                src='https://demo.foxthemes.net/instello/assets/images/post/post-2.jpg'
-              />
-            </AspectRatio>
-          </div>
-          <div className='post cursor-pointer  bg-black'>
+          <AspectRatio ratio={1 / 1}>
+            <LazyLoadImage
+              className='w-full h-full object-cover'
+              src='https://demo.foxthemes.net/socialite-v3.0/assets/images/post/img-2.jpg'
+            />
+          </AspectRatio>
+          <AspectRatio ratio={1 / 1}>
+            <LazyLoadImage
+              onBlur={''}
+              className='w-full h-full object-cover'
+              src='https://demo.foxthemes.net/socialite-v3.0/assets/images/post/img-2.jpg'
+            />
+          </AspectRatio>
+          <AspectRatio ratio={1 / 1}>
             <LazyLoadImage
               className='w-full h-full object-cover'
               src='https://demo.foxthemes.net/instello/assets/images/post/post-2.jpg'
             />
-          </div>
+          </AspectRatio>
+          <AspectRatio ratio={1 / 1}>
+            <LazyLoadImage
+              className='w-full h-full object-cover'
+              src='https://demo.foxthemes.net/instello/assets/images/post/post-2.jpg'
+            />
+          </AspectRatio>
         </div>
       </div>
     </section>

@@ -5,7 +5,7 @@ export const useToggleFollowers = create(set => ({
   setOpen: () => set(state => ({ open: !state.open }))
 }))
 
-const useToggleFollowings = create(set => ({
+export const useToggleFollowings = create(set => ({
   toggle: false,
   setToggle: () => set(state => ({ toggle: !state.toggle }))
 }))
