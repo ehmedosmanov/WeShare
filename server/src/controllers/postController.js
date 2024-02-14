@@ -1,36 +1,202 @@
 import Post from '../models/post.model.js'
 import generateFileName from '../utils/generate-filename.js'
-import { uploadFile } from '../helpers/s3.js'
+import {
+  deleteFile,
+  getObjectSignedUrl,
+  getVideoDurationFromS3,
+  uploadFile
+} from '../helpers/s3.js'
 import sharp from 'sharp'
+import { fileTypeFromBuffer } from 'file-type'
+import User from '../models/user.model.js'
 
-//TODO: MULTIPLE POSTS
-//s3 test
-export const createPost = async (req, res) => {
+//TODO: GET TAGGED POST
+//TODO: EDIT POST
+
+export const getAllPosts = async (req, res) => {
   try {
-    const { title, content } = req.body
-    const file = req.file
-    const postName = generateFileName()
+    const allPosts = await Post.find().populate('user')
 
-    const fileBuffer = await sharp(file.buffer)
-      .resize({ height: 1920, width: 1080, fit: 'contain' })
-      .toBuffer()
+    for (let post of allPosts) {
+      for (let mediaItem of post.media) {
+        console.log(mediaItem)
+        mediaItem.url = await getObjectSignedUrl(mediaItem.url)
+      }
+    }
 
-    // Загружаем изображение на сервер
-    await uploadFile(fileBuffer, postName, file.mimetype)
-
-    // Создаем объект Post с данными о загруженном изображении
-    const post = new Post({
-      title: title,
-      content: postName
-    })
-
-    // Сохраняем объект Post в базе данных
-    await post.save()
-
-    // Отправляем успешный ответ с данными о созданном посте
-    res.status(201).send(post)
+    res.status(200).json(allPosts)
   } catch (error) {
-    // Обрабатываем ошибку и отправляем соответствующий статус ответа
+    res.status(500).json({ message: error.message })
+  }
+}
+
+export const getFollowingPosts = async (req, res) => {
+  try {
+    const currentUserId = req.user.userId
+
+    const findUser = await User.findById(currentUserId).populate('following')
+    if (!findUser) return res.status(404).json({ message: 'User not found' })
+
+    const followingsUser = findUser.following
+
+    const followingsUserPosts = await Post.find({
+      user: { $in: followingsUser }
+    }).populate('user likes shares tags')
+
+    // undefined console.log(followingsUserPosts.media)
+
+    await Promise.all(
+      followingsUserPosts.map(async post => {
+        await Promise.all(
+          post.media.map(async mediaItem => {
+            mediaItem.url = await getObjectSignedUrl(mediaItem.url)
+          })
+        )
+      })
+    )
+
+    res.status(200).json(followingsUserPosts)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+export const getByIdPost = async (req, res) => {
+  try {
+    const { id } = req.params
+    const findPost = await Post.findById(id).populate('user')
+
+    for (let mediaItem of findPost.media) {
+      mediaItem.url = await getObjectSignedUrl(mediaItem.url)
+    }
+    if (!findPost) return res.status(404).json({ message: 'No post found' })
+    res.status(200).json(findPost)
+  } catch (error) {
     res.status(500).json({ error: error.message })
   }
 }
+
+export const createPost = async (req, res) => {
+  try {
+    const { content, userIds } = req.body
+    const createrUserId = req.user.userId
+    const allFiles = Object.values(req.files)
+
+    const findCreaterUser = await User.findById(createrUserId).populate('posts')
+    if (!findCreaterUser)
+      return res.status(404).json({ message: 'No user found' })
+
+    let mediaArray = []
+    let videoFileCount = 0
+    let usersForTag = []
+    if (userIds) {
+      usersForTag = await User.find({ _id: { $in: userIds } })
+      if (!usersForTag.length)
+        return res.status(404).json({ message: 'Users not found' })
+    }
+
+    for (let file of allFiles) {
+      const postName = generateFileName()
+      const type = await fileTypeFromBuffer(file.buffer)
+      let mediaType
+      let fileBuffer
+
+      if (type.mime.startsWith('image')) {
+        mediaType = 'Image'
+        fileBuffer = await sharp(file.buffer)
+          .resize({ height: 1920, width: 1080, fit: 'contain' })
+          .toBuffer()
+      } else if (type.mime.startsWith('video')) {
+        videoFileCount++
+        fileBuffer = file.buffer
+        // await processVideoFile(postName, postName, 'processed_' + postName)
+        await uploadFile(fileBuffer, postName, file.mimetype)
+
+        const duration = await getVideoDurationFromS3(postName)
+        const durationMilliseconds = Math.floor(duration) * 1000
+        console.log(durationMilliseconds)
+
+        if (
+          (videoFileCount === 1 &&
+            allFiles.length === 1 &&
+            durationMilliseconds > 180000) ||
+          (allFiles.length > 1 && durationMilliseconds > 60000)
+        ) {
+          return res.status(400).json({
+            message:
+              'If any videos are longer than one minute, you can only post one video at a time.'
+          })
+        }
+        if (durationMilliseconds <= 60000) {
+          mediaType = 'Reel'
+        } else {
+          mediaType = 'Video'
+        }
+        mediaType = 'Video'
+      } else {
+        return res.status(400).json({ message: 'Unsupported file type.' })
+      }
+
+      await uploadFile(fileBuffer, postName, file.mimetype)
+
+      mediaArray.push({
+        type: mediaType,
+        duration: mediaType === 'Reel' ? durationMilliseconds : undefined,
+        url: postName
+      })
+    }
+
+    const post = new Post({
+      ...req.body,
+      content: content,
+      user: findCreaterUser._id,
+      tags: usersForTag,
+      media: mediaArray
+    })
+
+    await post.save()
+
+    findCreaterUser.posts.push(post)
+    await findCreaterUser.save()
+
+    for (let user of post.tags) {
+      user.tagged.push(post)
+      await user.save()
+    }
+
+    res.status(201).json(post)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+export const deletePost = async (req, res) => {
+  try {
+    const { id } = req.params
+    const findPost = await Post.findById(id)
+
+    if (!findPost) return res.status(404).json({ message: 'No post found' })
+    await Promise.all(
+      findPost.media.map(async mediaUrl => {
+        await deleteFile(mediaUrl.url)
+      })
+    )
+    await Post.findByIdAndDelete(id)
+    res.status(200).json({ message: 'Post deleted successfully' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+// export const getCommentsForPost = async (req, res) => {
+//   try {
+//     const postId = req.params.postId
+//     const post = await Post.findById(postId).populate('comments')
+//     if (!post) {
+//       return res.status(404).json({ message: 'Post not found' })
+//     }
+//     res.json(post.comments)
+//   } catch (error) {
+//     res.status(500).json({ message: error.message })
+//   }
+// }
