@@ -33,11 +33,6 @@ const userSchema = new Schema(
       default:
         'https://www.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-600nw-2281862025.jpg'
     },
-    cover: {
-      type: String,
-      trim: true,
-      default: 'https://flowbite.com/docs/images/examples/image-3@2x.jpg'
-    },
     status: {
       type: String,
       enum: ['Online', 'Offline'],
@@ -74,14 +69,9 @@ const userSchema = new Schema(
     privateProfile: { type: Boolean, default: false },
     searchHistory: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     savedPosts: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
-    marks: [{ type: Schema.Types.ObjectId, ref: 'Mark' }],
+    tagged: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
     googleId: { type: String },
-    role: { type: String, enum: ['Admin', 'User'], default: 'User' },
-    visibility: {
-      type: String,
-      enum: ['All Members', 'My Connections', 'Only Me'],
-      default: 'All Members'
-    }
+    role: { type: String, enum: ['Admin', 'User'], default: 'User' }
   },
   { timestamps: true }
 )

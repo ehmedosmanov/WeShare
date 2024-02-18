@@ -33,7 +33,11 @@ export const getAllPosts = async (req, res) => {
 export const getFollowingPosts = async (req, res) => {
   try {
     const currentUserId = req.user.userId
+    const limit = 3
+    const page = req.query.page ? parseInt(req.query.page) : 1
+    const skip = (page - 1) * limit
 
+    console.log(page)
     const findUser = await User.findById(currentUserId).populate('following')
     if (!findUser) return res.status(404).json({ message: 'User not found' })
 
@@ -41,8 +45,12 @@ export const getFollowingPosts = async (req, res) => {
 
     const followingsUserPosts = await Post.find({
       user: { $in: followingsUser }
-    }).populate('user likes shares tags')
-
+    })
+      .populate('comments')
+      .populate('user likes shares tags')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
     // undefined console.log(followingsUserPosts.media)
 
     await Promise.all(
@@ -55,8 +63,9 @@ export const getFollowingPosts = async (req, res) => {
       })
     )
 
-    res.status(200).json(followingsUserPosts)
+    res.status(200).json({ posts: followingsUserPosts, nextPage: page + 1 })
   } catch (error) {
+    console.log(error.message)
     res.status(500).json({ message: error.message })
   }
 }
@@ -64,7 +73,17 @@ export const getFollowingPosts = async (req, res) => {
 export const getByIdPost = async (req, res) => {
   try {
     const { id } = req.params
-    const findPost = await Post.findById(id).populate('user')
+    const findPost = await Post.findById(id)
+      .populate('user')
+      .populate({
+        path: 'comments',
+        populate: [
+          { path: 'user' },
+          { path: 'post' },
+          { path: 'parentComments' },
+          { path: 'replies' }
+        ]
+      })
 
     for (let mediaItem of findPost.media) {
       mediaItem.url = await getObjectSignedUrl(mediaItem.url)
@@ -81,6 +100,11 @@ export const createPost = async (req, res) => {
     const { content, userIds } = req.body
     const createrUserId = req.user.userId
     const allFiles = Object.values(req.files)
+
+    if (allFiles.length === 0)
+      return res.status(404).json({ message: 'Files not found' })
+
+    console.log(req.body)
 
     const findCreaterUser = await User.findById(createrUserId).populate('posts')
     if (!findCreaterUser)

@@ -1,18 +1,24 @@
 import React, { Suspense } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import Footer from '../Footer'
 import MainNav from '@/components/NavbarComponents/MainNav'
 import ProfileSidebar from '@/components/ProfileSidebar'
 import MobileNav from '@/components/NavbarComponents/MobileNav'
+import { cn } from '@/lib/utils'
 
 const MainLayout = () => {
+  const location = useLocation()
   return (
     <>
       <MainNav />
       <div className='flex h-full'>
         <ProfileSidebar />
         <main className='w-full duration-300 md:pl-24 lg:pl-[18rem] flex-1 pt-[120px]'>
-          <div className='wrapper main__inner'>
+          <div
+            className={cn(
+              'wrapper main__inner',
+              location.pathname === '/' ? '!max-w-full' : null
+            )}>
             <Outlet />
           </div>
         </main>

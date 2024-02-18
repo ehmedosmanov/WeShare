@@ -1,43 +1,49 @@
-import React, { useEffect, useState } from 'react'
-import NavItem, { NavItemSkeleton } from './NavItem'
-import { Home, Compass, PlusCircle } from 'lucide-react'
+import React, { useContext, useEffect, useState } from 'react'
+import { cn } from '@/lib/utils'
+import { Home, Compass } from 'lucide-react'
+import { Link, useLocation } from 'react-router-dom'
+import CreatePostDialog from '@/components/NavbarComponents/CreatePostDialog'
+import { UploadContext } from '@/context/UploadContext'
 
 const ProfileNav = () => {
-  const [isLoading, setisLoading] = useState(true)
-  const navLinks = [
-    {
-      title: 'Home',
-      path: '/',
-      icon: <Home />
-    },
-    {
-      title: 'Feed',
-      path: '/feed',
-      icon: <Compass />
-    },
-    {
-      title: 'Create',
-      path: null,
-      icon: <PlusCircle />
-    }
-  ]
+  const location = useLocation()
+  const data = useContext(UploadContext)
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setisLoading(false)
-    }, 1000)
-
-    return () => clearTimeout(timer)
-  }, [])
+  console.log(data)
 
   return (
     <nav id='side-nav' className=''>
       <ul className='flex  flex-col gap-y-6'>
-        {isLoading
-          ? Array(navLinks.length)
-              .fill(0)
-              .map((_, i) => <NavItemSkeleton key={i} />)
-          : navLinks && navLinks.map(navLink => <NavItem {...navLink} />)}
+        <Link>
+          <li
+            to={'/'}
+            className={cn(
+              'flex justify-center lg:justify-start items-center gap-x-4 bg-primary-foreground/60 hover:bg-accent dark:hover:bg-primary-foreground/100 duration-300 py-3 px-3 border-2 shadow-sm cursor-pointer rounded-lg text-black dark:text-white',
+              location.pathname === '/'
+                ? 'border-2 shadow-sm  dark:bg-primary dark:hover:text-black hover:bg-primary/80 hover:text-white bg-primary text-white dark:text-black   dark:hover:bg-primary/80'
+                : null
+            )}>
+            <span>
+              <Home />
+            </span>
+            <h2 className='lg:inline hidden'>Home</h2>
+          </li>
+        </Link>
+        <Link to={'/feed'}>
+          <li
+            className={cn(
+              'flex justify-center lg:justify-start items-center gap-x-4 bg-primary-foreground/60 hover:bg-accent dark:hover:bg-primary-foreground/100 duration-300 py-3 px-3 border-2 shadow-sm cursor-pointer rounded-lg text-black dark:text-white',
+              location.pathname === '/feed'
+                ? 'border-2 shadow-sm  dark:bg-primary dark:hover:text-black hover:bg-primary/80 hover:text-white bg-primary text-white dark:text-black   dark:hover:bg-primary/80'
+                : null
+            )}>
+            <span>
+              <Compass />
+            </span>
+            <h2 className='lg:inline hidden'>Feed</h2>
+          </li>
+        </Link>
+        <CreatePostDialog {...data} />
       </ul>
     </nav>
   )

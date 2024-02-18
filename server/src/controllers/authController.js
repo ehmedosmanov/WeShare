@@ -22,7 +22,7 @@ export const authWithGoogle = async (req, res) => {
       personFields: 'emailAddresses,names,photos'
     })
 
-    console.log(me)
+    console.log('MEEEEEEEEEEEEEEEEEE', me)
 
     let user = await User.findOne({
       email: me.data.emailAddresses[0].value

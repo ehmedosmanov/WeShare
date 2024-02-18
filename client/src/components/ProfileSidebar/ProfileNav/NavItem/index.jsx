@@ -9,24 +9,25 @@ const NavItem = ({ path, title, icon }) => {
 
   return (
     <>
-      <li
-        className={cn(
-          'flex justify-center lg:justify-start items-center gap-x-4 bg-primary-foreground/60 hover:bg-accent dark:hover:bg-primary-foreground/100 duration-300 py-3 px-3 border-2 shadow-sm cursor-pointer rounded-lg text-black dark:text-white',
-          location.pathname === path
-            ? 'border-2 shadow-sm  dark:bg-primary dark:hover:text-black hover:bg-primary/80 hover:text-white bg-primary text-white dark:text-black   dark:hover:bg-primary/80'
-            : null
-        )}>
-        <span>{icon}</span>
-        {path ? (
-          <Link className='lg:inline hidden' to={path}>
-            {title}
-          </Link>
-        ) : (
-          <button className='lg:inline hidden' to={path}>
-            {title}
-          </button>
-        )}
-      </li>
+      <Link>
+        <li
+          to={path}
+          className={cn(
+            'flex justify-center lg:justify-start items-center gap-x-4 bg-primary-foreground/60 hover:bg-accent dark:hover:bg-primary-foreground/100 duration-300 py-3 px-3 border-2 shadow-sm cursor-pointer rounded-lg text-black dark:text-white',
+            location.pathname === path
+              ? 'border-2 shadow-sm  dark:bg-primary dark:hover:text-black hover:bg-primary/80 hover:text-white bg-primary text-white dark:text-black   dark:hover:bg-primary/80'
+              : null
+          )}>
+          <span>{icon}</span>
+          {path ? (
+            <Link className='lg:inline hidden'>{title}</Link>
+          ) : (
+            <button className='lg:inline hidden' to={path}>
+              {title}
+            </button>
+          )}
+        </li>
+      </Link>
     </>
   )
 }

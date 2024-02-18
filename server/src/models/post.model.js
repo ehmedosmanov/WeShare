@@ -4,34 +4,27 @@ const { Schema, model } = mongoose
 
 const postSchema = new Schema(
   {
-    title: { type: String, required: true },
     content: { type: String, required: true },
     user: { type: Schema.Types.ObjectId, ref: 'User' },
-    visibility: {
-      type: String,
-      enum: ['All Members', 'My Followers', 'Only Me'],
-      default: 'All Members'
-    },
-    type: {
-      type: String,
-      enum: ['Video', 'Photo', 'Text', 'Document', 'Mixed'],
-      default: 'Text'
-    },
     likes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     shares: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
-    tags: [{ type: String }],
+    tags: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     media: [
       {
         type: {
           type: String,
-          enum: ['Video', 'Photo', 'Document']
+          enum: ['Video', 'Image', 'Reel']
         },
-        url: { type: String }
+        url: { type: String },
+        duration: {
+          type: Number,
+          required: function () {
+            return this.type === 'Reel'
+          }
+        }
       }
     ],
-    hashtags: [{ type: String }],
-    isEdited: { type: Boolean, default: false },
     allowComment: { type: Boolean, default: true }
   },
   { timestamps: true }

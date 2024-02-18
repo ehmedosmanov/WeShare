@@ -188,12 +188,3 @@ export const useChangePassword = () => {
     onError: error => toast.error(error.response.data.error)
   })
 }
-
-//TODO: UNFOLLOWUSER--Done
-//TODO: SEARCH USER FIX
-//TODO: CURRENT PROFİLE -- Done
-//TODO: GETFOLLOWERS
-//TODO: GETFOLLOWING
-//TODO: CURRENT ACCOUNT FOLLOWERS FOLLOWING
-//TODO: IMPROVE SPEED BUTTONS
-//TODO: ERRORS OCCURED

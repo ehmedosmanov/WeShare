@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { Home, Search, Compass, PlusCircle } from 'lucide-react'
 import useOpenSearch from '@/hooks/use-open-search'
+import CreatePostDialog from '../CreatePostDialog'
+import { UploadContext } from '@/context/UploadContext'
 const MobileNav = () => {
   const { open, setOpen } = useOpenSearch()
-
+  const data = useContext(UploadContext)
   return (
     <nav className='md:hidden block bg-background h-16 border-t-2 shadow-md fixed w-full bottom-0'>
       <div className='mobile-navbar'>
@@ -23,7 +25,7 @@ const MobileNav = () => {
           </li>
           <li>
             <span className=' cursor-pointer'>
-              <PlusCircle />
+              <CreatePostDialog {...data} />
             </span>
           </li>
           <li>

@@ -28,8 +28,6 @@ const UserProfileHeading = () => {
 
   const isCurrentProfile = currentUser?._id === id
 
-  console.log(userProfile)
-
   if (isLoading) return <UserProfileSkeleton />
 
   return (

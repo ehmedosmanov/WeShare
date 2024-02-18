@@ -9,7 +9,7 @@ const MainPage = () => {
         <div className='col-span-1 lg:order-1 order-2 lg:col-span-8'>
           <HomePosts />
         </div>
-        <div className='col-span-1 order-1 lg:col-span-4'>
+        <div className='col-span-1 order-1 lg:col-span-4 w-full h-full'>
           <MainPageSidebar />
         </div>
       </div>
