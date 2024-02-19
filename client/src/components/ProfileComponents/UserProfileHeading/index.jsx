@@ -2,11 +2,7 @@ import React, { useState } from 'react'
 import UserProfileSkeleton from './UserProfileSkeleton'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { Link, useParams } from 'react-router-dom'
-import {
-  useGetMe,
-  useGetUserFollowers,
-  useGetUserProfile
-} from '@/hooks/UsersHooks'
+import { useGetMe, useGetUserProfile } from '@/hooks/UsersHooks'
 import { Button } from '@/components/ui/button'
 import FollowBtn from '@/components/Common/FollowBtn'
 import UnFollowBtn from '@/components/Common/UnFollowBtn'
@@ -17,9 +13,8 @@ import {
 import UserFollowers from '../UserFollowers'
 import UserFollowings from '../UserFollowings'
 
-const UserProfileHeading = () => {
-  const { id } = useParams()
-  const { data: userProfile, isLoading } = useGetUserProfile(id)
+const UserProfileHeading = ({ data: userProfile, isLoading, id }) => {
+  // const { data: userProfile, isLoading } = useGetUserProfile(id)
   const { data: currentUser } = useGetMe()
   const { setOpen } = useToggleFollowers()
   const { setToggle } = useToggleFollowings()

@@ -62,6 +62,7 @@ const HomePosts = () => {
     }
   }
 
+  console.log(data)
   return (
     <section id='posts' className='max-w-[580px] my-0 mx-auto'>
       <div className='wrapper'>
@@ -73,7 +74,7 @@ const HomePosts = () => {
                   isLoading={isLoading}
                   key={post?._id}
                   post={post}
-                  postId={post?._id}
+                  idPost={post?._id}
                   isLastPost={
                     pageIndex === data.pages.length - 1 &&
                     postIndex === page.posts.length - 1

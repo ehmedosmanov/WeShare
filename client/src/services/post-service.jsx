@@ -96,3 +96,30 @@ export const deleteComment = async id => {
     throw error
   }
 }
+
+export const addLikeToPost = async id => {
+  try {
+    console.log('mene gelen id', id)
+    const res = await api.post('/like/like-post', id)
+    if (!res.data) {
+      throw new Error('No data received from server')
+    }
+    return res.data
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
+}
+
+export const getLikesFromPost = async id => {
+  try {
+    const res = await api.get(`/like/get-likes/${id}`)
+    if (!res.data) {
+      throw new Error('No data received from server')
+    }
+    return res.data
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
+}

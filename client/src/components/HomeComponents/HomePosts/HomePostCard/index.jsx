@@ -14,11 +14,17 @@ import PostDialog from '@/components/Common/PostDialog'
 import { motion } from 'framer-motion'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { UploadContext } from '@/context/UploadContext'
-import { useGetPost } from '@/hooks/PostHooks'
+import {
+  useAddLikeToPost,
+  useGetFollowingsPosts,
+  useGetPost
+} from '@/hooks/PostHooks'
 import useStore from '@/hooks/use-store'
+import { useGetMe } from '@/hooks/UsersHooks'
 
 const HomePostCard = ({
   post,
+  idPost,
   isLastPost,
   onIntersect,
   activeVideo,
@@ -40,10 +46,22 @@ const HomePostCard = ({
 
   // const { handleOpen, openDialog } = useContext(UploadContext)
   const { postId, setPostId, openDialog, setOpenDialog } = useStore()
+  const { data: currentUser } = useGetMe()
+  const { mutate } = useAddLikeToPost()
 
   const handleOpenPost = id => {
     setPostId(id)
     setOpenDialog(true)
+  }
+
+  const isLiked = currentUser.likes.some(x => x === post._id)
+
+  const handleLike = () => {
+    console.log('object')
+    console.log(`Like ${post._id}`)
+    mutate({
+      id: post._id
+    })
   }
 
   // В вашем PostDialog
@@ -63,6 +81,7 @@ const HomePostCard = ({
   //   setShouldOpen(true)
   // }
 
+  console.log(isLiked)
   return (
     <motion.div
       ref={isLastPost ? onIntersect : null}
@@ -182,10 +201,17 @@ const HomePostCard = ({
           <div className='flex flex-col justify-center  w-full'>
             <div className='flex justify-between items-center '>
               <ul className='flex items-center gap-2'>
-                <li className='cursor-pointer'>
-                  <span>
-                    <Heart />
-                  </span>
+                <li className='cursor-pointer' onClick={handleLike}>
+                  {isLiked ? (
+                    <span className='rounded-full bg-red-500'>
+                      Liked
+                      <Heart color='#fff' className='bg-red-500' />
+                    </span>
+                  ) : (
+                    <span>
+                      <Heart />
+                    </span>
+                  )}
                 </li>
                 <li
                   onClick={() => handleOpenPost(post?._id)}

@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-query'
 import {
   addCommentToPost,
+  addLikeToPost,
   deleteComment,
   getAllPosts,
   getFollowingsPosts,
@@ -25,9 +26,10 @@ export const useGetAllPosts = () => {
 export const useGetFollowingsPosts = () => {
   return useInfiniteQuery({
     queryFn: getFollowingsPosts,
-    staleTime: 2000 * 60,
+    staleTime: 1000 * 60,
     queryKey: ['followingsPosts'],
-    getNextPageParam: (lastPage, allPages) => lastPage.nextPage
+    getNextPageParam: (lastPage, allPages) => lastPage.nextPage,
+    refetchOnWindowFocus: true
   })
 }
 
@@ -80,13 +82,29 @@ export const useAddCommentToPost = () => {
   })
 }
 
-export const useDeleteComment =()  => {
+export const useDeleteComment = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id) => deleteComment(id),
+    mutationFn: id => deleteComment(id),
     mutationKey: ['deleteComment'],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['postComments'] })
+    }
+  })
+}
+
+export const useAddLikeToPost = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: id => addLikeToPost(id),
+    mutationKey: ['addLikeToPost'],
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['followingsPosts']
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['me']
+      })
     }
   })
 }

@@ -28,7 +28,6 @@ const PostDialog = ({ postId, openDialog }) => {
   const { data: postData, isLoading, isFetching } = useGetPost(postId)
   const { setOpenDialog } = useStore()
   const [imageLoading, setImageLoading] = useState(false)
-  const [viewReply, setWiewReply] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [togglePicker, setTogglePicker] = useState(false)
   const [commentText, setCommentText] = useState('')
@@ -268,7 +267,7 @@ const PostDialog = ({ postId, openDialog }) => {
       </div>
       <div
         onClick={() => setOpenDialog(false)}
-        className={`fixed inset-0 z-[20] bg-black/10 ${
+        className={`fixed inset-0 z-[20] bg-black/5 ${
           openDialog
             ? 'opacity-100 visible fade-in-0  animate-in'
             : 'opaacity-0 invisible fade-out-95  animate-out'

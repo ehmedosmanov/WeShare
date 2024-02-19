@@ -1,8 +1,34 @@
 import { AspectRatio } from '@/components/ui/aspect-ratio'
-import React from 'react'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
+import { useInView } from 'react-intersection-observer'
+import { motion, useAnimation } from 'framer-motion'
+import { MoonLoader } from 'react-spinners'
+import 'swiper/css'
+import 'swiper/css/pagination'
+import 'swiper/css/navigation'
+import React, { useEffect, useState } from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Pagination, Navigation } from 'swiper/modules'
+import ReactPlayer from 'react-player'
+import { useGetUserPosts } from '@/hooks/UsersHooks'
+import PostCard from '@/components/Common/PostCard'
 
-const UserPosts = () => {
+const UserPosts = ({ id }) => {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useGetUserPosts(id)
+
+  const [ref, inView] = useInView({
+    triggerOnce: false,
+    threshold: 0.1
+  })
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage()
+    }
+  }, [inView, hasNextPage, isFetchingNextPage])
+
+  console.log(data)
   return (
     <section>
       <div className='divider h-[2px] mt-12 w-12/12 bg-primary-foreground/90'></div>
@@ -11,31 +37,21 @@ const UserPosts = () => {
           <h3 className='text-3xl font-bold text-primary'>Posts</h3>
         </div>
         <div className='posts py-4 gap-1 grid grid-cols-2 md:grid-cols-3'>
-          <AspectRatio ratio={1 / 1}>
-            <LazyLoadImage
-              className='w-full h-full object-cover'
-              src='https://demo.foxthemes.net/socialite-v3.0/assets/images/post/img-2.jpg'
-            />
-          </AspectRatio>
-          <AspectRatio ratio={1 / 1}>
-            <LazyLoadImage
-              onBlur={''}
-              className='w-full h-full object-cover'
-              src='https://demo.foxthemes.net/socialite-v3.0/assets/images/post/img-2.jpg'
-            />
-          </AspectRatio>
-          <AspectRatio ratio={1 / 1}>
-            <LazyLoadImage
-              className='w-full h-full object-cover'
-              src='https://demo.foxthemes.net/instello/assets/images/post/post-2.jpg'
-            />
-          </AspectRatio>
-          <AspectRatio ratio={1 / 1}>
-            <LazyLoadImage
-              className='w-full h-full object-cover'
-              src='https://demo.foxthemes.net/instello/assets/images/post/post-2.jpg'
-            />
-          </AspectRatio>
+          {data &&
+            data?.pages?.map((page, pageIndex) =>
+              page?.posts?.map((post, postIndex) => (
+                <PostCard
+                  post={post}
+                  isLoading={isLoading}
+                  key={post?._id}
+                  isLastPost={
+                    pageIndex === data.pages.length - 1 &&
+                    postIndex === page.posts.length - 1
+                  }
+                  onIntersect={ref}
+                />
+              ))
+            )}
         </div>
       </div>
     </section>
@@ -43,3 +59,66 @@ const UserPosts = () => {
 }
 
 export default UserPosts
+
+// {userPosts && userPosts.length === 0 ? (
+//   <h2>User Dont Have any Post</h2>
+// ) : (
+//   userPosts?.posts.map(post => (
+//     <AspectRatio key={post._id} ratio={1 / 1}>
+//       {post.media.length === 1 ? (
+//         <>
+//           {post.media[0].type === 'Video' ? (
+//             <ReactPlayer
+//               className='customVideo'
+//               controls={false}
+//               muted={true}
+//               loop={false}
+//               url={post.media[0]?.url}
+//             />
+//           ) : (
+//             <LazyLoadImage
+//               src={post.media[0]?.url}
+//               className={`w-full h-full object-cover`}
+//               alt={post.media[0]?.type}
+//             />
+//           )}
+//         </>
+//       ) : (
+//         <Swiper
+//           slidesPerView={1}
+//           navigation={true}
+//           centeredSlides={true}
+//           pagination={{
+//             clickable: true
+//           }}
+//           modules={[Pagination, Navigation]}
+//           className='mySwiper'>
+//           {post?.media.map((media, mediaIndex) => (
+//             <SwiperSlide key={media?._id}>
+//               {media?.type === 'Video' ? (
+//                 <AspectRatio ratio={1 / 1}>
+//                   <ReactPlayer
+//                     className='customVideo'
+//                     controls={true}
+//                     loop={true}
+//                     width='100%'
+//                     height='100%'
+//                     url={media?.url}
+//                   />
+//                 </AspectRatio>
+//               ) : (
+//                 <AspectRatio ratio={1 / 1}>
+//                   <LazyLoadImage
+//                     src={media?.url}
+//                     className={`w-full h-full object-cover`}
+//                     alt={media?.type}
+//                   />
+//                 </AspectRatio>
+//               )}
+//             </SwiperSlide>
+//           ))}
+//         </Swiper>
+//       )}
+//     </AspectRatio>
+//   ))
+// )}

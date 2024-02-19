@@ -133,6 +133,22 @@ export const getUserFollowings = async id => {
   }
 }
 
+export const getUserPosts = async ({ queryKey, pageParam = 1 }) => {
+  try {
+    const [_key, id] = queryKey
+    console.log('user posts', id)
+    console.log('user posts s', pageParam)
+    const res = await api.get(`/user/user-posts/${id}?page=${pageParam}`)
+    if (!res.data) {
+      throw new Error('No data received from server')
+    }
+    return res.data
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
+}
+
 export const removeFromFollowers = async id => {
   try {
     console.log(`Removing ${id} from `)

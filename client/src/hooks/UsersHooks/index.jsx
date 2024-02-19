@@ -5,6 +5,7 @@ import {
   getSearchHistotyUser,
   getUserFollowers,
   getUserFollowings,
+  getUserPosts,
   getUserProfile,
   getUsers,
   removeFromFollowers,
@@ -13,7 +14,12 @@ import {
   updateProfile
 } from '@/services/user-service'
 import { toast } from 'sonner'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  useQuery,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient
+} from '@tanstack/react-query'
 
 export const useGetMe = () => {
   return useQuery({
@@ -186,5 +192,16 @@ export const useChangePassword = () => {
     mutationKey: ['changePassword'],
     onSuccess: () => toast.success('Password changed successfully'),
     onError: error => toast.error(error.response.data.error)
+  })
+}
+
+export const useGetUserPosts = id => {
+  return useInfiniteQuery({
+    queryFn: getUserPosts,
+    staleTime: 1000 * 60,
+    queryKey: ['userPosts', id],
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.nextPage ? lastPage.nextPage : false,
+    refetchOnWindowFocus: true
   })
 }
