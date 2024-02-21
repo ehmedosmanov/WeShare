@@ -198,7 +198,7 @@ export const useChangePassword = () => {
 export const useGetUserPosts = id => {
   return useInfiniteQuery({
     queryFn: getUserPosts,
-    staleTime: 1000 * 60,
+    staleTime: 2000 * 60,
     queryKey: ['userPosts', id],
     getNextPageParam: (lastPage, allPages) =>
       lastPage.nextPage ? lastPage.nextPage : false,

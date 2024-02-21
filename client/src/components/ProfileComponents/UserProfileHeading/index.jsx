@@ -12,9 +12,12 @@ import {
 } from '@/hooks/use-toggle-followers'
 import UserFollowers from '../UserFollowers'
 import UserFollowings from '../UserFollowings'
-
+import useConversation from '@/hooks/use-conversation'
+import { useNavigate } from 'react-router-dom'
 const UserProfileHeading = ({ data: userProfile, isLoading, id }) => {
   // const { data: userProfile, isLoading } = useGetUserProfile(id)
+  const { selectedConversation, setSelectedConversation } = useConversation()
+  const navigate = useNavigate()
   const { data: currentUser } = useGetMe()
   const { setOpen } = useToggleFollowers()
   const { setToggle } = useToggleFollowings()
@@ -24,6 +27,11 @@ const UserProfileHeading = ({ data: userProfile, isLoading, id }) => {
   const isCurrentProfile = currentUser?._id === id
 
   if (isLoading) return <UserProfileSkeleton />
+
+  const handleClick = profile => {
+    navigate('/chat')
+    setSelectedConversation(profile)
+  }
 
   return (
     <section id='user-profile' className=''>
@@ -58,7 +66,13 @@ const UserProfileHeading = ({ data: userProfile, isLoading, id }) => {
                     )}
                   </li>
                   <li>
-                    <Button className='duration-300'>Send Message</Button>
+                    {isCurrentProfile ? null : (
+                      <Button
+                        onClick={() => handleClick(userProfile)}
+                        className='duration-300'>
+                        Send Message
+                      </Button>
+                    )}
                   </li>
                 </ul>
               </div>

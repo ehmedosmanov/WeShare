@@ -109,15 +109,11 @@ export const getPostComments = async (req, res) => {
   try {
     const { id } = req.params
 
-    console.log(req.params)
-
     if (!id) {
       return res.status(400).json({ message: 'postId is required' })
     }
 
     const getComments = await getAllComments(id)
-
-    console.log(getComments)
 
     if (!getComments) {
       return res.status(404).json({ message: 'Comments not found' })
@@ -132,7 +128,7 @@ export const getPostComments = async (req, res) => {
 export const deleteComment = async (req, res) => {
   try {
     const { id } = req.params
-    console.log(req.params)
+
     const comment = await Comment.findById(id)
 
     if (!comment) return res.status(404).json({ message: 'Comment not found' })

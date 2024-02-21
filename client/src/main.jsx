@@ -13,6 +13,7 @@ import {
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { api } from './services/api/index.jsx'
 import UploadContextProvider from './context/UploadContext.jsx'
+import { SocketContextProvider } from './context/SocketContext.jsx'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,7 +31,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <ThemeProvider defaultTheme='system' storageKey='vite-ui-theme'>
       <QueryClientProvider client={queryClient}>
         <UploadContextProvider>
-          <App />
+          <SocketContextProvider>
+            <App />
+          </SocketContextProvider>
         </UploadContextProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>

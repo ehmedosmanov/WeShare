@@ -11,6 +11,7 @@ import {
   deleteComment,
   getAllPosts,
   getFollowingsPosts,
+  getLikesFromPost,
   getPost,
   getPostComments,
   uploadPost
@@ -19,6 +20,7 @@ import {
 export const useGetAllPosts = () => {
   return useQuery({
     queryFn: () => getAllPosts(),
+    staleTime: 1000 * 60 * 2,
     queryKey: ['allPosts']
   })
 }
@@ -26,10 +28,10 @@ export const useGetAllPosts = () => {
 export const useGetFollowingsPosts = () => {
   return useInfiniteQuery({
     queryFn: getFollowingsPosts,
-    staleTime: 1000 * 60,
     queryKey: ['followingsPosts'],
-    getNextPageParam: (lastPage, allPages) => lastPage.nextPage,
-    refetchOnWindowFocus: true
+    getNextPageParam: lastPage => {
+      return lastPage.posts.length ? lastPage.nextPage : null
+    }
   })
 }
 
@@ -98,13 +100,35 @@ export const useAddLikeToPost = () => {
   return useMutation({
     mutationFn: id => addLikeToPost(id),
     mutationKey: ['addLikeToPost'],
-    onSuccess: () => {
+    onSuccess: (postId, variables, context) => {
+      // console.log('postiD', postId)
+      // const oldData = queryClient.getQueryData('followingsPosts')
+
+      // console.log('old data', oldData)
+      // // Update the specific post in the cache
+      // const newData = oldData.map(post =>
+      //   post.id === variables ? { ...post, likes: post.likes + 1 } : post
+      // )
+
+      // // Update the cache with the new data
+      //queryClient.setQueryData('followingsPosts', newData)
+      // queryClient.invalidateQueries({
+      //   queryKey: ['followingsPosts']
+      // })
       queryClient.invalidateQueries({
-        queryKey: ['followingsPosts']
+        queryKey: ['postLikes', postId]
       })
       queryClient.invalidateQueries({
         queryKey: ['me']
       })
     }
+  })
+}
+
+export const useGetLikesByPost = id => {
+  return useQuery({
+    queryFn: () => getLikesFromPost(id),
+    staleTime: 1000 * 60 * 3,
+    queryKey: ['postLikes', id]
   })
 }

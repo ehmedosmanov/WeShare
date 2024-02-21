@@ -1,3 +1,4 @@
+import { getObjectSignedUrl } from '../helpers/s3.js'
 import User from '../models/user.model.js'
 
 // TODO: Change Email--Done
@@ -45,10 +46,19 @@ export const getUser = async (req, res) => {
     const user = await User.findById(currentUser?.userId)
       .populate('following')
       .populate('followers')
+      .populate({
+        path: 'conversations',
+        populate: [
+          { path: 'participants', model: 'User' },
+          { path: 'messages', model: 'Message' }
+        ]
+      })
       .populate('searchHistory')
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
+
+    user.avatar = await getObjectSignedUrl(user.avatar)
 
     res.json(user)
   } catch (error) {
@@ -147,8 +157,6 @@ export const removeFromFollowers = async (req, res) => {
     const { id } = req.params
     const { userId } = req.user
 
-    console.log('MEne gelen id: ', id)
-
     await User.findByIdAndUpdate(
       userId,
       { $pull: { followers: id } },
@@ -172,8 +180,6 @@ export const followUser = async (req, res) => {
   try {
     const { id } = req.body
     const currentUser = req.user
-    console.log('Follow Edilen', req.body)
-    console.log('Follow Eden', currentUser.userId)
 
     if (id === currentUser.userId) {
       return res.status(403).json({ message: 'You cant follow yourself' })
@@ -213,9 +219,6 @@ export const unFollowUser = async (req, res) => {
 
     if (!followedUser)
       return res.status(404).json({ message: 'User not found' })
-
-    console.log('istifadeci unfollow eden', userId)
-    console.log('unfollow olunan', id)
 
     //Follow eden userin followedler update olunur
     await User.findByIdAndUpdate(

@@ -40,7 +40,7 @@ const FileUploader = ({ files, setFiles }) => {
           }
         }}
         name='media'
-        labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
+        labelIdle='Drag & Drop your files or <span className="filepond--label-action">Browse</span>'
       />
     </div>
   )

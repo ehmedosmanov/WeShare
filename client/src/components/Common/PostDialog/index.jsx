@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Pagination, Navigation } from 'swiper/modules'
+import { Pagination } from 'swiper/modules'
 import ReactPlayer from 'react-player'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import 'swiper/css'
 import 'swiper/css/pagination'
-import 'swiper/css/navigation'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
@@ -18,15 +17,15 @@ import {
 } from '@/hooks/PostHooks'
 import useStore from '@/hooks/use-store'
 import { PostDialogSkeleton } from './PostDialogSkeleton'
-import { MessageCircleMore, Heart, Share, SmilePlus } from 'lucide-react'
+import { MessageCircleMore, Heart, X, Share, SmilePlus } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import moment from 'moment'
-import { useGetMe } from '@/hooks/UsersHooks'
+import { useFollowUser, useGetMe } from '@/hooks/UsersHooks'
 import Comment from '../Comment'
 
-const PostDialog = ({ postId, openDialog }) => {
+const PostDialog = ({ postId }) => {
   const { data: postData, isLoading, isFetching } = useGetPost(postId)
-  const { setOpenDialog } = useStore()
+  const { setOpenDialog, openDialog } = useStore()
   const [imageLoading, setImageLoading] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [togglePicker, setTogglePicker] = useState(false)
@@ -35,6 +34,8 @@ const PostDialog = ({ postId, openDialog }) => {
   const [parentId, setParentId] = useState(null)
   const { data: postComments, isLoading: commentsLoading } =
     useGetPostComments(postId)
+  const { mutate: follow, isPending: followPending } = useFollowUser()
+
   const { data: currentUserId } = useGetMe()
   const { mutate, isPending } = useAddCommentToPost()
 
@@ -77,9 +78,9 @@ const PostDialog = ({ postId, openDialog }) => {
   }
 
   return (
-    <>
+    <div className='relative'>
       <div
-        className={`max-h-full overflow-y-auto lg:overflow-y-hidden lg:min-h-[93%]  border dialog fixed left-[50%] top-[50%] z-[40]  w-full translate-x-[-50%] translate-y-[-50%] grid overflow-hidden grid-cols-1 md:grid-cols-2  rounded-2xl border-none bg-background shadow-lg duration-200 ${
+        className={` max-h-full overflow-y-auto lg:overflow-y-hidden lg:min-h-[93%]  border dialog fixed left-[50%] top-[50%] z-[40]  w-full translate-x-[-50%] translate-y-[-50%] grid overflow-hidden grid-cols-1 md:grid-cols-2  rounded-2xl border-none bg-background shadow-lg duration-200 ${
           openDialog
             ? 'opacity-100 no-scrollbar visible '
             : 'opaacity-0 invisible'
@@ -110,12 +111,11 @@ const PostDialog = ({ postId, openDialog }) => {
           ) : (
             <Swiper
               slidesPerView={1}
-              navigation={true}
               centeredSlides={true}
               pagination={{
                 clickable: true
               }}
-              modules={[Pagination, Navigation]}
+              modules={[Pagination]}
               className='mySwiper'>
               {postData?.media?.map((media, mediaIndex) => (
                 <SwiperSlide key={media?._id}>
@@ -154,10 +154,25 @@ const PostDialog = ({ postId, openDialog }) => {
                 className='flex  items-center
                 user'>
                 <h4 className='font-bold'>{postData?.user?.username}</h4>
-                <span className='mx-1'>•</span>
-                <Button className='h-0 p-0' variant='link'>
-                  Follow
-                </Button>
+                {postData?.user?._id !== currentUserId._id &&
+                !currentUserId?.following.some(
+                  x => x._id === postData?.user?._id
+                ) ? (
+                  <>
+                    <span className='mx-1'>•</span>
+                    <Button
+                      disabled={followPending}
+                      onClick={() =>
+                        follow({
+                          id: postData?.user?._id
+                        })
+                      }
+                      className='h-0 p-0'
+                      variant='link'>
+                      Follow
+                    </Button>
+                  </>
+                ) : null}
               </div>
             </div>
           </div>
@@ -265,14 +280,21 @@ const PostDialog = ({ postId, openDialog }) => {
           </div>
         </div>
       </div>
+
       <div
         onClick={() => setOpenDialog(false)}
-        className={`fixed inset-0 z-[20] bg-black/5 ${
+        className={` no-scrollbar fixed inset-0 z-[20] bg-black/5 ${
           openDialog
             ? 'opacity-100 visible fade-in-0  animate-in'
             : 'opaacity-0 invisible fade-out-95  animate-out'
-        }`}></div>
-    </>
+        }`}>
+        <span
+          onClick={() => setOpenDialog(false)}
+          className='text-xl absolute top-6 right-6'>
+          <X />
+        </span>
+      </div>
+    </div>
   )
 }
 

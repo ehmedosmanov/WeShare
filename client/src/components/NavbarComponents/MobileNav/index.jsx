@@ -8,7 +8,7 @@ const MobileNav = () => {
   const { open, setOpen } = useOpenSearch()
   const data = useContext(UploadContext)
   return (
-    <nav className='md:hidden block bg-background h-16 border-t-2 shadow-md fixed w-full bottom-0'>
+    <nav className='md:hidden block bg-background h-16 border-t-2 shadow-md z-40 fixed w-full bottom-0'>
       <div className='mobile-navbar'>
         <ul className='flex justify-evenly items-center h-16'>
           <li>

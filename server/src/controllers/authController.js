@@ -28,7 +28,7 @@ export const authWithGoogle = async (req, res) => {
       email: me.data.emailAddresses[0].value
     })
     if (!user) {
-      const avatarUrl = me.data.photos
+      const avatarUrl = me.data.photos[0]
         ? me.data.photos.url
         : 'default-avatar-url'
       user = new User({
@@ -105,17 +105,16 @@ export const login = async (req, res) => {
 
     const { username, password } = req.body
 
-    console.log(req.body)
-
     const user = await User.findOne({
       $or: [{ email: username }, { username: username }]
     })
 
-    console.log(user)
-
     if (!user) return res.status(404).json({ message: 'User not found' })
 
     const isValidPassword = user.checkPassword(password)
+
+    console.log(isValidPassword)
+
     if (!isValidPassword || !user) {
       return res.status(400).json({ error: 'Invalid password or Username' })
     }
@@ -154,7 +153,8 @@ export const login = async (req, res) => {
       sameSite: 'None'
     })
 
-    res.status(200).json({ message: 'Welcome Back!' })
+    console.log(user)
+    res.status(200).json(user)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }

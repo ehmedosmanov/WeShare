@@ -19,7 +19,6 @@ export const getAllPosts = async (req, res) => {
 
     for (let post of allPosts) {
       for (let mediaItem of post.media) {
-        console.log(mediaItem)
         mediaItem.url = await getObjectSignedUrl(mediaItem.url)
       }
     }
@@ -37,7 +36,6 @@ export const getFollowingPosts = async (req, res) => {
     const page = req.query.page ? parseInt(req.query.page) : 1
     const skip = (page - 1) * limit
 
-    console.log(page)
     const findUser = await User.findById(currentUserId).populate('following')
     if (!findUser) return res.status(404).json({ message: 'User not found' })
 
@@ -103,8 +101,6 @@ export const createPost = async (req, res) => {
 
     if (allFiles.length === 0)
       return res.status(404).json({ message: 'Files not found' })
-
-    console.log(req.body)
 
     const findCreaterUser = await User.findById(createrUserId).populate('posts')
     if (!findCreaterUser)

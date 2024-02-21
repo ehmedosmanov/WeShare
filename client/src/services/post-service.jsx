@@ -15,6 +15,7 @@ export const getAllPosts = async () => {
 
 export const getFollowingsPosts = async ({ pageParam = 1 }) => {
   try {
+    console.log(pageParam)
     const res = await api.get(`/post/get-followings-posts?page=${pageParam}`)
     if (!res.data) {
       throw new Error('No data received from server')
@@ -113,6 +114,7 @@ export const addLikeToPost = async id => {
 
 export const getLikesFromPost = async id => {
   try {
+    console.log('likes', id)
     const res = await api.get(`/like/get-likes/${id}`)
     if (!res.data) {
       throw new Error('No data received from server')

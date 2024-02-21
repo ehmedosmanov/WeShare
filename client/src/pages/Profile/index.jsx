@@ -15,12 +15,8 @@ const Profile = () => {
       <Helmet>
         <title>Profile </title>
       </Helmet>
-      <LazyLoadComponent>
-        <UserProfileHeading id={id} {...getUserProfile} />
-      </LazyLoadComponent>
-      <LazyLoadComponent>
-        <UserPosts id={id} />
-      </LazyLoadComponent>
+      <UserProfileHeading id={id} {...getUserProfile} />
+      <UserPosts id={id} />
     </>
   )
 }

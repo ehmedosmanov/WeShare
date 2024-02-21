@@ -1,8 +1,12 @@
-import { getObjectSignedUrl } from '../helpers/s3.js'
+import { fileTypeFromBuffer } from 'file-type'
+import { getObjectSignedUrl, uploadFile } from '../helpers/s3.js'
 import Post from '../models/post.model.js'
 import User from '../models/user.model.js'
+import generateFileName from '../utils/generate-filename.js'
 import { profileSchema } from '../validators/profile-validations.js'
 import bcrypt from 'bcrypt'
+import sharp from 'sharp'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
 export const getUserProfile = async (req, res) => {
   try {
@@ -15,6 +19,8 @@ export const getUserProfile = async (req, res) => {
     if (!findUser) {
       return res.status(404).json({ message: 'User not found' })
     }
+
+    findUser.avatar = await getObjectSignedUrl(findUser.avatar)
 
     await Promise.all(
       findUser.posts.map(async post => {
@@ -35,7 +41,6 @@ export const getUserProfile = async (req, res) => {
 export const getUserPosts = async (req, res) => {
   try {
     const { id } = req.params
-    console.log('user post', req.params)
     const limit = 6
     const page = req.query.page ? parseInt(req.query.page) : 1
     const skip = (page - 1) * limit
@@ -110,6 +115,36 @@ export const changePassword = async (req, res) => {
 
     await findUser.save()
     res.status(200).json({ message: 'Password changed successfully' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+export const changeAvatar = async (req, res) => {
+  try {
+    const { userId } = req.user
+    const avatar = req.file
+    const avatarName = generateFileName()
+
+    const fileBuffer = await sharp(avatar.buffer)
+      .resize({
+        width: 140,
+        height: 140,
+        fit: 'contain'
+      })
+      .toBuffer()
+
+    await uploadFile(fileBuffer, avatarName, avatar.mimetype)
+
+    const findUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: { avatar: avatarName }
+      },
+      { new: true }
+    )
+
+    res.status(200).json(findUser)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }

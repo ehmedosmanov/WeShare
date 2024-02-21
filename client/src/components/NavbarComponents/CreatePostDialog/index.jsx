@@ -17,6 +17,7 @@ import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
 import { Textarea } from '@/components/ui/textarea'
 import MediaPreview from '@/components/ProfileSidebar/MediaPreview'
 import FileUploader from '@/components/FileUploader'
+import { cn } from '@/lib/utils'
 
 const CreatePostDialog = ({
   step,
@@ -33,12 +34,20 @@ const CreatePostDialog = ({
     <div>
       <Dialog>
         <DialogTrigger asChild>
-          <Button
-            className='flex    justify-center lg:justify-start items-center gap-x-4 bg-none md:bg-primary-foreground/60 hover:bg-accent dark:hover:bg-primary-foreground/100 duration-300 py-3  px-3 border-1 md:border-2 shadow-sm cursor-pointer w-full h-full rounded-lg text-black dark:text-white'
+          <li
+            className='flex justify-center lg:justify-start items-center gap-x-4 bg-none md:bg-primary-foreground/60 hover:bg-accent dark:hover:bg-primary-foreground/100 duration-300 py-3  px-3 border-1 md:border-2 shadow-sm cursor-pointer w-full h-full rounded-lg text-black dark:text-white'
             variant='outline'>
-            <PlusCircle />
-            <span className='lg:inline hidden'>Create</span>
-          </Button>
+            <span>
+              <PlusCircle />
+            </span>
+            <span
+              className={cn(
+                'lg:inline hidden duration-100',
+                location.pathname === '/chat' ? ' invisible' : ''
+              )}>
+              Create
+            </span>
+          </li>
         </DialogTrigger>
         <DialogContent className='sm:max-w-[30%] sm:min-h-[30%]'>
           <DialogHeader>

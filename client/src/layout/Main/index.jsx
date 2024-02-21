@@ -5,6 +5,7 @@ import MainNav from '@/components/NavbarComponents/MainNav'
 import ProfileSidebar from '@/components/ProfileSidebar'
 import MobileNav from '@/components/NavbarComponents/MobileNav'
 import { cn } from '@/lib/utils'
+import ChatSidebar from '@/components/ChatComponents/ChatSidebar'
 
 const MainLayout = () => {
   const location = useLocation()
@@ -13,11 +14,14 @@ const MainLayout = () => {
       <MainNav />
       <div className='flex h-full'>
         <ProfileSidebar />
-        <main className='w-full duration-300 md:pl-24 lg:pl-[18rem] flex-1 pt-[120px]'>
+        <main className='w-full duration-300 md:pl-24 lg:pl-[280px] flex-1 pt-[85px]'>
+          {/* {location.pathname === '/chat' ? <ChatSidebar /> : null} */}
           <div
             className={cn(
               'wrapper main__inner',
-              location.pathname === '/' ? '!max-w-full' : null
+              location.pathname === '/' ? '!max-w-full ' : null,
+              location.pathname === '/feed' ? '!p-0 !max-w-[100%] !m-0' : '',
+              location.pathname === '/chat' ? '!p-0 !max-w-[100%] !m-0' : ''
             )}>
             <Outlet />
           </div>

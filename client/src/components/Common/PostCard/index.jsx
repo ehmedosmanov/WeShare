@@ -22,29 +22,34 @@ import {
 import useStore from '@/hooks/use-store'
 import { useGetMe } from '@/hooks/UsersHooks'
 
-const PostCard = ({ post, onIntersect, isLastPost }) => {
+const PostCard = React.memo(({ post, onIntersect, isLastPost }) => {
   const { postId, setPostId, openDialog, setOpenDialog } = useStore()
+
   const handleOpenPost = id => {
     setPostId(id)
     setOpenDialog(true)
   }
 
   return (
-    <div
-      className='cursor-pointer'
-      onClick={() => handleOpenPost(post?._id)}
-      ref={isLastPost ? onIntersect : null}>
-      <AspectRatio ref={isLastPost ? onIntersect : null} ratio={1 / 1}>
+    <div className='cursor-pointer' ref={isLastPost ? onIntersect : null}>
+      <AspectRatio
+        onClick={() => handleOpenPost(post?._id)}
+        ref={isLastPost ? onIntersect : null}
+        ratio={1 / 1}>
         {post?.media.length === 1 ? (
           <>
             {post.media[0].type === 'Video' ? (
-              <ReactPlayer
-                className='customVideo'
-                controls={false}
-                muted={true}
-                loop={false}
-                url={post.media[0]?.url}
-              />
+              <div className='w-[100%] h-[100%]'>
+                <ReactPlayer
+                  className='w-0 h-0'
+                  controls={false}
+                  muted={true}
+                  width={'100%'}
+                  height={'100%'}
+                  loop={false}
+                  url={post.media[0]?.url}
+                />
+              </div>
             ) : (
               <LazyLoadImage
                 src={post.media[0]?.url}
@@ -56,12 +61,11 @@ const PostCard = ({ post, onIntersect, isLastPost }) => {
         ) : (
           <Swiper
             slidesPerView={1}
-            navigation={true}
             centeredSlides={true}
             pagination={{
               clickable: true
             }}
-            modules={[Pagination, Navigation]}
+            modules={[Pagination]}
             className='mySwiper'>
             {post?.media.map((media, mediaIndex) => (
               <SwiperSlide key={media?._id}>
@@ -71,7 +75,7 @@ const PostCard = ({ post, onIntersect, isLastPost }) => {
                       className='customVideo'
                       controls={true}
                       loop={true}
-                      width='100%'
+                      width='0'
                       height='100%'
                       url={media?.url}
                     />
@@ -90,9 +94,9 @@ const PostCard = ({ post, onIntersect, isLastPost }) => {
           </Swiper>
         )}
       </AspectRatio>
-      <PostDialog postId={postId} openDialog={openDialog} />
+      <PostDialog postId={postId} />
     </div>
   )
-}
+})
 
 export default PostCard

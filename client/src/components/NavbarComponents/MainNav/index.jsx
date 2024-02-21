@@ -19,7 +19,7 @@ const MainNav = () => {
   return (
     <nav
       id='main-nav'
-      className='fixed top-0 w-full z-10 bg-secondary border shadow-lg py-4'>
+      className='fixed z-50 top-0 w-full bg-secondary border shadow-lg py-4'>
       <div className='wrapper px-4 md:px-6 lg:px-8 xl:px-10'>
         <div className='flex justify-between items-center'>
           <div className='flex items-center gap-x-3'>

@@ -9,10 +9,12 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
 import moment from 'moment'
+import { Link } from 'react-router-dom'
+import { useDeleteComment } from '@/hooks/PostHooks'
 
 const ReplyComment = ({ replyHandle, replies, commentId, currentUserId }) => {
   const [isExpanded, setIsExpanded] = useState(false)
-
+  const { mutate } = useDeleteComment()
   const handleReadMoreClick = () => {
     setIsExpanded(true)
   }
@@ -37,6 +39,18 @@ const ReplyComment = ({ replyHandle, replies, commentId, currentUserId }) => {
               {!isExpanded && replies?.content?.split(' ').length > 50 && (
                 <button onClick={handleReadMoreClick}>Read more</button>
               )}
+              {/* {replies?.content?.split(' ').map((word, index) => {
+                if (word.startsWith('@')) {
+                  const userId = word.slice(1) 
+                  return (
+                    <Link to={`/profile/${userId}`} key={index}>
+                      {word}
+                    </Link>
+                  )
+                } else {
+                  return word + ' ' // Добавьте пробел после каждого слова, чтобы они не склеивались вместе
+                }
+              })} */}
             </p>
             <div className='flex'>
               <div className='flex items-center'>
@@ -58,7 +72,9 @@ const ReplyComment = ({ replyHandle, replies, commentId, currentUserId }) => {
                       </AlertDialogTrigger>
                     ) : null}
                     <AlertDialogContent>
-                      <AlertDialogAction className='bg-red-600/70'>
+                      <AlertDialogAction
+                        onClick={() => mutate(replies._id)}
+                        className='bg-red-600/70'>
                         Delete
                       </AlertDialogAction>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
