@@ -40,9 +40,9 @@ const UserDropdown = () => {
     <>
       <DropdownMenu className='mr-8'>
         <DropdownMenuTrigger asChild>
-          <Avatar>
+          <Avatar className='border border-primary/10'>
             <AvatarImage src={currentUser?.avatar} />
-            <AvatarFallback>{fallBack.toString()}</AvatarFallback>
+            <AvatarFallback>{fallBack.toString().toUpperCase()}</AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent className='w-56'>

@@ -22,8 +22,6 @@ export const authWithGoogle = async (req, res) => {
       personFields: 'emailAddresses,names,photos'
     })
 
-    console.log('MEEEEEEEEEEEEEEEEEE', me)
-
     let user = await User.findOne({
       email: me.data.emailAddresses[0].value
     })
@@ -52,18 +50,16 @@ export const authWithGoogle = async (req, res) => {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       origin: process.env.CLIENT_URL,
-      secure: true,
-      sameSite: 'None',
       maxAge: 30 * 24 * 60 * 60 * 1000
     })
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       origin: process.env.CLIENT_URL,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      secure: true,
-      sameSite: 'None'
+      maxAge: 30 * 24 * 60 * 60 * 1000
     })
+
+    console.log('token', accessToken)
 
     res.redirect(process.env.CLIENT_URL)
   } catch (error) {
@@ -113,8 +109,6 @@ export const login = async (req, res) => {
 
     const isValidPassword = user.checkPassword(password)
 
-    console.log(isValidPassword)
-
     if (!isValidPassword || !user) {
       return res.status(400).json({ error: 'Invalid password or Username' })
     }
@@ -130,7 +124,6 @@ export const login = async (req, res) => {
         ${user.otpCode}
       `
       await sendMail(user.email, 'Please verify your code', emailText)
-      console.log(user.otpCode)
       return res
         .status(200)
         .json({ message: 'OTP code sent. Please check your email.' })
@@ -141,19 +134,14 @@ export const login = async (req, res) => {
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      secure: true,
-      sameSite: 'None'
+      maxAge: 30 * 24 * 60 * 60 * 1000
     })
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      secure: true,
-      sameSite: 'None'
+      maxAge: 30 * 24 * 60 * 60 * 1000
     })
 
-    console.log(user)
     res.status(200).json(user)
   } catch (error) {
     res.status(500).json({ message: error.message })
@@ -200,23 +188,32 @@ export const register = async (req, res) => {
 export const refreshAccessToken = async (req, res) => {
   try {
     const { refreshToken } = req.cookies
-    if (!refreshToken)
+    if (!refreshToken) {
+      console.log('Refresh Token is MISSING')
       return res.status(401).json({ message: 'Refresh Token is MISSING' })
+    }
+
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
+    console.log('Decoded Refresh Token:', decoded)
 
     const findUser = await User.findById(decoded.userId)
-    if (!findUser) return res.status(404).json({ message: 'User Not Found' })
+    if (!findUser) {
+      console.log('User Not Found')
+      return res.status(404).json({ message: 'User Not Found' })
+    }
 
     const newToken = generateAccessToken(findUser)
+    console.log('New Access Token:', newToken)
+
     res.cookie('accessToken', newToken, {
       httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      secure: true,
-      sameSite: 'None'
+      maxAge: 30 * 24 * 60 * 60 * 1000
     })
 
+    console.log('Access Token refreshed successfully')
     res.status(200).json({ token: newToken })
   } catch (error) {
+    console.error('Error refreshing access token:', error.message)
     res.status(500).json({ message: error.message })
   }
 }
@@ -261,7 +258,6 @@ export const resetPassword = async (req, res) => {
 export const verifyEmail = async (req, res) => {
   try {
     const { token } = req.query
-    console.log(token)
     const user = await User.findOne({ emailVerificationToken: token })
     if (!user) {
       return res.status(400).json({ message: 'Invalid token.' })
@@ -276,16 +272,12 @@ export const verifyEmail = async (req, res) => {
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      secure: true,
-      sameSite: 'None'
+      maxAge: 30 * 24 * 60 * 60 * 1000
     })
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      secure: true,
-      sameSite: 'None'
+      maxAge: 30 * 24 * 60 * 60 * 1000
     })
     res.status(200).json({ message: 'Account confirmed' })
   } catch (error) {

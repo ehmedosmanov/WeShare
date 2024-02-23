@@ -12,6 +12,8 @@ import Picker from '@emoji-mart/react'
 import { MoonLoader } from 'react-spinners'
 import {
   useAddCommentToPost,
+  useAddLikeToPost,
+  useGetLikesByPost,
   useGetPost,
   useGetPostComments
 } from '@/hooks/PostHooks'
@@ -32,17 +34,26 @@ const PostDialog = ({ postId }) => {
   const [commentText, setCommentText] = useState('')
   const [username, setUsername] = useState('')
   const [parentId, setParentId] = useState(null)
+  const { refetch } = useGetLikesByPost(postId)
   const { data: postComments, isLoading: commentsLoading } =
     useGetPostComments(postId)
   const { mutate: follow, isPending: followPending } = useFollowUser()
 
   const { data: currentUserId } = useGetMe()
   const { mutate, isPending } = useAddCommentToPost()
+  const { mutate: addLike } = useAddLikeToPost()
 
   const handleReadMoreClick = () => {
     setIsExpanded(true)
   }
 
+  const handleLike = id => {
+    console.log(`Like ${id}`)
+    addLike({
+      id: id
+    })
+    refetch()
+  }
   if (isLoading || commentsLoading) return <PostDialogSkeleton />
 
   if (!openDialog) return null
@@ -80,7 +91,7 @@ const PostDialog = ({ postId }) => {
   return (
     <div className='relative'>
       <div
-        className={` max-h-full overflow-y-auto lg:overflow-y-hidden lg:min-h-[93%]  border dialog fixed left-[50%] top-[50%] z-[40]  w-full translate-x-[-50%] translate-y-[-50%] grid overflow-hidden grid-cols-1 md:grid-cols-2  rounded-2xl border-none bg-background shadow-lg duration-200 ${
+        className={` max-h-full overflow-y-auto lg:overflow-y-hidden lg:min-h-[93%]  border dialog fixed left-[50%] top-[50%] z-[51]  w-full translate-x-[-50%] translate-y-[-50%] grid overflow-hidden grid-cols-1 md:grid-cols-2  rounded-2xl border-none bg-background shadow-lg duration-200 ${
           openDialog
             ? 'opacity-100 no-scrollbar visible '
             : 'opaacity-0 invisible'
@@ -232,7 +243,9 @@ const PostDialog = ({ postId }) => {
             <div className='flex justify-start w-full border-b pb-3'>
               <div className='flex flex-row items-center justify-between gap-y-2 gap-x-2 w-6/5'>
                 <ul className='flex items-center gap-2'>
-                  <li className='cursor-pointer'>
+                  <li
+                    className='cursor-pointer'
+                    onClick={() => handleLike(postId)}>
                     <span>
                       <Heart />
                     </span>

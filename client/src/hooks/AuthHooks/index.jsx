@@ -51,7 +51,6 @@ export const useIsAuth = () => {
   return useQuery({
     queryFn: () => authStatus(),
     queryKey: ['status'],
-    staleTime: 1000 * 60 * 5,
     onSuccess: data => {
       if (data && data?.isAuthenticated) {
         console.log('bu nedi ala', data.isAuthenticated)

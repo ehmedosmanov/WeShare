@@ -9,6 +9,7 @@ import {
   addCommentToPost,
   addLikeToPost,
   deleteComment,
+  deletePost,
   getAllPosts,
   getFollowingsPosts,
   getLikesFromPost,
@@ -95,28 +96,25 @@ export const useDeleteComment = () => {
   })
 }
 
+export const useDeletePost = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: id => deletePost(id),
+    mutationKey: ['deletePost'],
+    onSuccess: id => {
+      queryClient.invalidateQueries({ queryKey: ['post', id] })
+    }
+  })
+}
+
 export const useAddLikeToPost = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: id => addLikeToPost(id),
     mutationKey: ['addLikeToPost'],
-    onSuccess: (postId, variables, context) => {
-      // console.log('postiD', postId)
-      // const oldData = queryClient.getQueryData('followingsPosts')
-
-      // console.log('old data', oldData)
-      // // Update the specific post in the cache
-      // const newData = oldData.map(post =>
-      //   post.id === variables ? { ...post, likes: post.likes + 1 } : post
-      // )
-
-      // // Update the cache with the new data
-      //queryClient.setQueryData('followingsPosts', newData)
-      // queryClient.invalidateQueries({
-      //   queryKey: ['followingsPosts']
-      // })
+    onSuccess: id => {
       queryClient.invalidateQueries({
-        queryKey: ['postLikes', postId]
+        queryKey: ['postLikes', id]
       })
       queryClient.invalidateQueries({
         queryKey: ['me']

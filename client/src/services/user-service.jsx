@@ -41,7 +41,8 @@ export const getSearchHistotyUser = async () => {
 
 export const saveSearchHistoryUser = async data => {
   try {
-    const res = await api.post('/user/save-history', data)
+    console.log('bura ne gelir', data)
+    const res = await api.post(`/user/save-history/${data}`)
     if (!res.data) {
       throw new Error('No data received from server')
     }
@@ -49,6 +50,20 @@ export const saveSearchHistoryUser = async data => {
     return res.data
   } catch (error) {
     console.log(error.message)
+    throw error
+  }
+}
+
+export const deleteFromSearchHistoryUser = async data => {
+  try {
+    console.log('why delete from search history')
+    const res = await api.delete(`/user/delete-history/${data}`)
+    if (!res.data) {
+      throw new Error('No data received from server')
+    }
+    return res.data
+  } catch (error) {
+    console.log(error)
     throw error
   }
 }
@@ -172,6 +187,19 @@ export const changeUserPassword = async data => {
     }
     return res.data
   } catch (error) {
+    throw error
+  }
+}
+
+export const changeAvatar = async data => {
+  try {
+    const res = await api.put(`/user/change-avatar/`, data)
+    if (!res.data) {
+      throw new Error('No data received from server')
+    }
+    return res.data
+  } catch (error) {
+    console.log(error)
     throw error
   }
 }

@@ -1,11 +1,12 @@
 import {
+  useDeleteFromHistory,
   useGetMe,
   useGetSearchHistory,
   useGetUsers,
   useSaveSearchHistory
 } from '@/hooks/UsersHooks'
 import { useState, useEffect } from 'react'
-import { BadgeCheck, Lock, Search } from 'lucide-react'
+import { BadgeCheck, Lock, Search, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import {
   CommandDialog,
@@ -18,6 +19,7 @@ import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import useOpenSearch from '@/hooks/use-open-search'
 const SearchUsers = () => {
   const { data: users, isLoading, isSuccess } = useGetUsers()
+  const { mutate: deleteHisotory, isPending } = useDeleteFromHistory()
   const {
     data: searchHistoryData,
     isLoading: searchHistoryLoading,
@@ -29,7 +31,7 @@ const SearchUsers = () => {
     isLoading: currentUserLoading,
     isSuccess: currentUserSuccess
   } = useGetMe()
-  const { mutate } = useSaveSearchHistory()
+  const { mutate: saveHistory } = useSaveSearchHistory()
   const [searchedUsers, setSearchedUsers] = useState([])
   const { open, setOpen } = useOpenSearch()
   const [query, setQuery] = useState('')
@@ -63,6 +65,16 @@ const SearchUsers = () => {
   }, [query])
 
   const searchHistory = searchHistoryData || []
+
+  const handleDeleteHisotory = id => {
+    console.log(`Delete hisory`, id)
+    deleteHisotory(id)
+  }
+
+  const handleSaveHistory = id => {
+    console.log(`Save hisory`, id)
+    saveHistory(id)
+  }
 
   return (
     <>
@@ -112,61 +124,70 @@ const SearchUsers = () => {
                       to={`/profile/${user?._id}`}
                       onClick={() => {
                         setOpen(false)
-                        mutate({
-                          id: user?._id
-                        })
+                        handleSaveHistory(user?._id)
+                        setQuery('')
                       }}>
                       {user?.username}
                     </Link>
                   </div>
 
                   <div className=''>
-                    <Button
+                    {/* <Button
                       variant={'default'}
                       className={'py-1 h-9 rounded-full'}>
-                      Follow
-                    </Button>
+                      Delete
+                    </Button> */}
                   </div>
                 </div>
               ))
             ) : (
-              <CommandList>No searched User.</CommandList>
+              <CommandList className='text-center py-5'>
+                No searched User.
+              </CommandList>
             )
           ) : (
-            <div className='flex flex-col py-2'>
-              {searchHistory
-                ? searchHistory.map(user => (
-                    <div
-                      key={user._id}
-                      className='mx-2 p-2 rounded hover:bg-accent flex justify-between items-center'>
-                      <div className='flex gap-2 items-center'>
-                        <Avatar>
-                          <AvatarImage src={user?.avatar} />
-                        </Avatar>
-                        <Link
-                          className='flex items-center gap-x-2'
-                          to={`/profile/${user?._id}`}
-                          onClick={() => {
-                            setOpen(false)
-                            mutate({
-                              id: user?._id
-                            })
-                          }}>
-                          {user?.username}
-                        </Link>
-                      </div>
+            <>
+              <div className='flex flex-col py-2'>
+                {searchHistory
+                  ? searchHistory.map(user => (
+                      <div
+                        key={user._id}
+                        className='mx-2 p-2 rounded hover:bg-accent flex justify-between items-center'>
+                        <div className='flex gap-2 items-center'>
+                          <Avatar>
+                            <AvatarImage src={user?.avatar} />
+                          </Avatar>
+                          <Link
+                            className='flex items-center gap-x-2'
+                            to={`/profile/${user?._id}`}
+                            onClick={() => {
+                              setOpen(false)
+                              mutate({
+                                id: user?._id
+                              })
+                            }}>
+                            {user?.username}
+                          </Link>
+                        </div>
 
-                      <div className=''>
-                        <Button
-                          variant={'default'}
-                          className={'py-1 h-9 rounded-full'}>
-                          Follow
-                        </Button>
+                        <div className=''>
+                          <Button
+                            onClick={() => handleDeleteHisotory(user?._id)}
+                            variant={'default'}
+                            className={'h-6 w-6 px-0 rounded-full'}>
+                            <X size={18} />
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  ))
-                : null}
-            </div>
+                    ))
+                  : null}
+              </div>
+              {searchHistory.length === 0 && (
+                <CommandEmpty className='text-center py-5'>
+                  No searched.
+                </CommandEmpty>
+              )}
+            </>
           )}
         </CommandList>
       </CommandDialog>

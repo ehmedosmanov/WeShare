@@ -98,9 +98,22 @@ export const deleteComment = async id => {
   }
 }
 
+export const deletePost = async id => {
+  try {
+    const res = await api.delete(`/post/delete-post/${id}`)
+    if (!res.data) {
+      throw new Error('No data received from server')
+    }
+    return res.data
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
+}
+
 export const addLikeToPost = async id => {
   try {
-    console.log('mene gelen id', id)
+    console.log('bura catr', id)
     const res = await api.post('/like/like-post', id)
     if (!res.data) {
       throw new Error('No data received from server')

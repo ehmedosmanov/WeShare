@@ -7,12 +7,14 @@ import { AspectRatio } from '@radix-ui/react-aspect-ratio'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import { useQueryClient } from '@tanstack/react-query'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import PostDialog from '@/components/Common/PostDialog'
 import { motion } from 'framer-motion'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { UploadContext } from '@/context/UploadContext'
+import axios from 'axios'
 import {
   useAddLikeToPost,
   useGetFollowingsPosts,
@@ -32,10 +34,11 @@ import {
 import FollowBtn from '@/components/Common/FollowBtn'
 import { Link } from 'react-router-dom'
 import UnFollowBtn from '@/components/Common/UnFollowBtn'
+import { api } from '@/services/api'
+import { cn } from '@/lib/utils'
 
 const HomePostCard = ({
   post,
-  idPost,
   isLastPost,
   onIntersect,
   activeVideo,
@@ -59,11 +62,14 @@ const HomePostCard = ({
   const { postId, setPostId, openDialog, setOpenDialog } = useStore()
   const { data: currentUser } = useGetMe()
   const [id, setId] = useState(null)
-  const [postLike, setPostLike] = useState(post.likes.length)
-  const [isLiked, setIsLiked] = useState(post.likes.includes(currentUser?._id))
   const { data: currentUserId } = useGetMe()
-  const { data: usersLikes, isLoading } = useGetLikesByPost(post._id)
+  const [postLikes, setPostLikes] = useState(null)
+  const { data: usersLikes, refetch, isLoading } = useGetLikesByPost(post._id)
   const { mutate, isSuccess } = useAddLikeToPost()
+  const [postLike, setPostLike] = useState(null)
+  const [clickedByMe, setClickedByMe] = useState(null)
+  // const { data: likes, i } = useGetPost(post._id)
+  const [isLiked, setIsLiked] = useState(null)
 
   const handleOpenPost = id => {
     setPostId(id)
@@ -71,48 +77,49 @@ const HomePostCard = ({
     setOpenDialog(true)
   }
 
-  // useEffect(() => {
-  //   setPostLike(post.likes.length)
-  // }, [])
-
-  // useEffect(() => {
-  //   if (isSuccess) {
-  //     setPostLike(prevLike =>
-  //       prevLike === post?.likes.length ? prevLike + 1 : prevLike - 1
-  //     )
-  //   }
-  // }, [isSuccess, post])
-
-  console.log(post.likes.length)
-
-  // const isLiked = currentUser?.likes?.some(x => x === post._id)
-
-  const handleLike = () => {
-    mutate({
-      id: post._id
-    })
+  const handleLike = async () => {
+    try {
+      const res = await axios.post(
+        'http://localhost:8000/api/like/like-post',
+        { id: post?._id },
+        {
+          withCredentials: true
+        }
+      )
+      if (!res.data) {
+        throw new Error('No data received from server')
+      }
+      const likedPost = await axios.get(
+        `http://localhost:8000/api/post/get-post/${post?._id}`,
+        {
+          withCredentials: true
+        }
+      )
+      console.log(likedPost)
+      const likedPostData = likedPost.data
+      setPostLikes(likedPostData?.likes)
+      refetch()
+    } catch (error) {
+      console.log(error)
+      throw error
+    }
   }
-  // const [Id, setId] = useState(null)
-  // const [shouldOpen, setShouldOpen] = useState(false)
-  // const { data: postData, isLoading } = useGetPost(Id)
-
-  // useEffect(() => {
-  //   if (postData && !isLoading && shouldOpen) {
-  //     handleOpen()
-  //   }
-  // }, [postData, isLoading, shouldOpen])
-
-  // const handleOpenPost = postId => {
-  //   setId(postId)
-  //   setShouldOpen(true)
-  // }
 
   useEffect(() => {
-    if (isSuccess) {
-      setIsLiked(!isLiked)
-      isLiked ? setPostLike(postLike - 1) : setPostLike(postLike + 1)
-    }
-  }, [isSuccess])
+    setIsLiked(post.likes.includes(currentUser?._id))
+    setPostLike(post.likes.length)
+  }, [])
+
+  useEffect(() => {
+    postLikes?.includes(currentUser?._id)
+      ? setClickedByMe(true)
+      : setClickedByMe(false)
+  }, [postLikes])
+
+  useEffect(() => {
+    const likedPost = post?.likes?.find(x => x?._id === currentUser?._id)
+    likedPost ? setClickedByMe(true) : setClickedByMe(false)
+  }, [])
 
   return (
     <motion.div
@@ -237,15 +244,16 @@ const HomePostCard = ({
                   {/* <li className='flex flex-row items-center justify-center mb-10 w-full'>
                 </li> */}
                   <li className='cursor-pointer' onClick={handleLike}>
-                    {isLiked ? (
-                      <span className='rounded-full bg-red-500'>
-                        <Heart color='#fff' className='bg-red-500' />
-                      </span>
-                    ) : (
-                      <span>
-                        <Heart />
-                      </span>
-                    )}
+                    <span className='rounded-full bg-red-500'>
+                      <Heart
+                        size={30}
+                        color='#fff'
+                        className={cn(
+                          'bg-none  rounded-full  p-1',
+                          clickedByMe ? 'bg-red-500' : 'bg-none'
+                        )}
+                      />
+                    </span>
                   </li>
                   <li
                     onClick={() => handleOpenPost(post?._id)}
@@ -267,7 +275,9 @@ const HomePostCard = ({
             </div>
             <div className='flex flex-col justify-start pl-1 items-start mt-2 font-semibold'>
               <div className=' cursor-pointer'>
-                {postLike !== null ? postLike : 0}
+                {/* {postLike !== null ? postLike : 0} */}
+                {console.log('poslikes', postLikes)}
+                {postLikes === null ? post?.likes?.length : postLikes.length}
                 <Dialog>
                   <DialogTrigger asChild>
                     <button className='ml-2'>Likes</button>

@@ -208,15 +208,18 @@ export const deletePost = async (req, res) => {
   }
 }
 
-// export const getCommentsForPost = async (req, res) => {
-//   try {
-//     const postId = req.params.postId
-//     const post = await Post.findById(postId).populate('comments')
-//     if (!post) {
-//       return res.status(404).json({ message: 'Post not found' })
-//     }
-//     res.json(post.comments)
-//   } catch (error) {
-//     res.status(500).json({ message: error.message })
-//   }
-// }
+export const updatePost = async (req, res) => {
+  try {
+    const { id } = req.params
+    const findPost = await Post.findByIdAndUpdate(
+      id,
+      { $set: req.body.content },
+      { new: true }
+    )
+
+    if (!findPost) return res.status(404).json({ message: 'Not Found' })
+    res.status(200).json({ message: 'Updated successfully' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}

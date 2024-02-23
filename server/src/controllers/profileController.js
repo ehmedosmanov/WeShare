@@ -126,6 +126,8 @@ export const changeAvatar = async (req, res) => {
     const avatar = req.file
     const avatarName = generateFileName()
 
+    console.log(avatar)
+
     const fileBuffer = await sharp(avatar.buffer)
       .resize({
         width: 140,

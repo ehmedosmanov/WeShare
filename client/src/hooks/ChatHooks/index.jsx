@@ -16,7 +16,9 @@ export const useSendMessage = () => {
 export const useGetMessages = id => {
   return useQuery({
     queryFn: () => getMessages(id),
-    queryKey: ['messages', id]
+    staleTime: 1000 * 60,
+    queryKey: ['messages', id],
+    refetchOnWindowFocus: true
   })
 }
 

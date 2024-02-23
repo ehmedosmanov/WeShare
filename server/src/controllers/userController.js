@@ -1,10 +1,6 @@
 import { getObjectSignedUrl } from '../helpers/s3.js'
 import User from '../models/user.model.js'
 
-// TODO: Change Email--Done
-// TODO: Follow,Unfollow--Done
-// TODO: Private Account, (Account Controller)
-
 export const enableTwoFactorAuthentication = async (req, res) => {
   try {
     const { userId } = req.body
@@ -72,7 +68,14 @@ export const getUsers = async (req, res) => {
 
     const filterVerifiedUsers = users.filter(x => x.verified)
 
-    res.json(filterVerifiedUsers)
+    const avatars = filterVerifiedUsers.map(async user => {
+      const avatarUrl = await getObjectSignedUrl(user?.avatar)
+      return { ...user._doc, avatarUrl }
+    })
+
+    const result = await Promise.all(avatars)
+
+    res.json(result)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
@@ -98,7 +101,7 @@ export const searchHistory = async (req, res) => {
 
 export const deleteFromHistory = async (req, res) => {
   try {
-    const { id } = req.body
+    const { id } = req.params
     const currentUser = req.user
     const user = await User.findById(currentUser?.userId).populate(
       'searchHistory'
@@ -127,7 +130,8 @@ export const deleteFromHistory = async (req, res) => {
 
 export const saveSearchHistory = async (req, res) => {
   try {
-    const { id } = req.body
+    const { id } = req.params
+    console.log(`saveSearchHistory`, id)
     const user = await User.findById(req.user.userId)
     const findUser = await User.findById(id)
     if (!findUser) {

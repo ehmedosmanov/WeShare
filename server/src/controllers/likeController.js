@@ -7,6 +7,8 @@ export const addLikeToPost = async (req, res) => {
     const currentUserId = req.user.userId
     const { id } = req.body
 
+    console.log(req.body)
+
     const user = await User.findById(currentUserId)
     const post = await Post.findById(id)
 

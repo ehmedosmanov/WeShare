@@ -2,7 +2,11 @@ import React, { useState } from 'react'
 import UserProfileSkeleton from './UserProfileSkeleton'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { Link, useParams } from 'react-router-dom'
-import { useGetMe, useGetUserProfile } from '@/hooks/UsersHooks'
+import {
+  useGetMe,
+  useGetUserProfile,
+  useUpdateAvatar
+} from '@/hooks/UsersHooks'
 import { Button } from '@/components/ui/button'
 import FollowBtn from '@/components/Common/FollowBtn'
 import UnFollowBtn from '@/components/Common/UnFollowBtn'
@@ -14,6 +18,7 @@ import UserFollowers from '../UserFollowers'
 import UserFollowings from '../UserFollowings'
 import useConversation from '@/hooks/use-conversation'
 import { useNavigate } from 'react-router-dom'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 const UserProfileHeading = ({ data: userProfile, isLoading, id }) => {
   // const { data: userProfile, isLoading } = useGetUserProfile(id)
   const { selectedConversation, setSelectedConversation } = useConversation()
@@ -21,7 +26,6 @@ const UserProfileHeading = ({ data: userProfile, isLoading, id }) => {
   const { data: currentUser } = useGetMe()
   const { setOpen } = useToggleFollowers()
   const { setToggle } = useToggleFollowings()
-
   const isFollowing = currentUser?.following.some(x => x._id === id)
 
   const isCurrentProfile = currentUser?._id === id
@@ -33,15 +37,21 @@ const UserProfileHeading = ({ data: userProfile, isLoading, id }) => {
     setSelectedConversation(profile)
   }
 
+  const fallBack =
+    userProfile?.firstName?.charAt(0) + userProfile?.lastName?.charAt(0)
   return (
     <section id='user-profile' className=''>
       <div className='profile-heading'>
         <div className='flex md:flex-row flex-col  gap-x-16'>
-          <div className='max-w-[140px] rounded-full'>
+          <div className='max-w-[140px]  cursor-pointer rounded-full'>
             <LazyLoadImage
               className='w-full rounded-full object-contain'
               alt={userProfile?.username}
-              src={userProfile?.avatar}
+              src={`${
+                userProfile?.avatar
+                  ? userProfile?.avatar
+                  : 'https://www.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-600nw-2281862025.jpg'
+              }`}
             />
           </div>
           <div className='flex w-full max-w-[85%] lg:max-w-[65%] flex-col gap-y-8'>

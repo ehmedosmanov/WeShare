@@ -1,5 +1,7 @@
 import {
+  changeAvatar,
   changeUserPassword,
+  deleteFromSearchHistoryUser,
   followUser,
   getMeUser,
   getSearchHistotyUser,
@@ -203,5 +205,48 @@ export const useGetUserPosts = id => {
     getNextPageParam: (lastPage, allPages) =>
       lastPage.nextPage ? lastPage.nextPage : false,
     refetchOnWindowFocus: true
+  })
+}
+
+export const useUpdateAvatar = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: data => changeAvatar(data),
+    mutationKey: ['updateAvatar'],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['me'] })
+    }
+  })
+}
+
+// export const useSaveSearchHistory = () => {
+//   const queryClient = useQueryClient()
+//   return useMutation({
+//     mutationFn: data => saveSearchHistoryUser(data),
+//     mutationKey: ['saveSearchHistory'],
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ['searchHistory'] })
+//     },
+//     onError: err => {
+//       if (err.response) {
+//         const { data } = err.response
+//         if (data.error === 'User Already Exist') {
+//           return toast.error('User with this email or username already exists.')
+//         }
+//       } else {
+//         toast.error('Failed to connect to the server. Please try again later.')
+//       }
+//     }
+//   })
+// }
+
+export const useDeleteFromHistory = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: data => deleteFromSearchHistoryUser(data),
+    mutationKey: ['deleteFromSearchHistory'],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['searchHistory'] })
+    }
   })
 }

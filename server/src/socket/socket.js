@@ -45,6 +45,10 @@ io.on('connection', socket => {
     }
   })
 
+  socket.on('newMessage', newMessage => {
+    io.emit('newMessage', newMessage)
+  })
+
   socket.on('disconnect', () => {
     console.log('user disconnected', socket.id)
     delete userSocketMap[userId]

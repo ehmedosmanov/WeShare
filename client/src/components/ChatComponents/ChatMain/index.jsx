@@ -9,6 +9,7 @@ import NoOneInChat from '../NoOneInChat'
 import MessageInput from '../MessageInput'
 import Message from '../Messaage'
 import Messages from '../AllMessages'
+import { AvatarFallback } from '@radix-ui/react-avatar'
 
 const ChatMain = () => {
   const { selectedConversation, setSelectedConversation } = useConversation()
@@ -16,7 +17,9 @@ const ChatMain = () => {
   useEffect(() => {
     return () => setSelectedConversation(null)
   }, [setSelectedConversation])
-
+  const fallBack =
+    selectedConversation?.firstName?.charAt(0) +
+    selectedConversation?.lastName?.charAt(0)
   return (
     <section className='h-full'>
       {!selectedConversation ? (
@@ -27,6 +30,7 @@ const ChatMain = () => {
             <div className='flex items-center py-4 gap-x-2'>
               <Avatar>
                 <AvatarImage src={selectedConversation?.avatar} />
+                <AvatarFallback>{fallBack.toString()}</AvatarFallback>
               </Avatar>
               <h4 className=' font-bold'>{selectedConversation?.username}</h4>
             </div>
