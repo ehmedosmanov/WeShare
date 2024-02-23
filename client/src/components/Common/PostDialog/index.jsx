@@ -13,6 +13,7 @@ import { MoonLoader } from 'react-spinners'
 import {
   useAddCommentToPost,
   useAddLikeToPost,
+  useDeletePost,
   useGetLikesByPost,
   useGetPost,
   useGetPostComments
@@ -24,17 +25,21 @@ import { Input } from '@/components/ui/input'
 import moment from 'moment'
 import { useFollowUser, useGetMe } from '@/hooks/UsersHooks'
 import Comment from '../Comment'
+import { cn } from '@/lib/utils'
+import { XCircle } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
-const PostDialog = ({ postId }) => {
+const PostDialog = ({ clickedByMe, postId }) => {
   const { data: postData, isLoading, isFetching } = useGetPost(postId)
   const { setOpenDialog, openDialog } = useStore()
   const [imageLoading, setImageLoading] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [togglePicker, setTogglePicker] = useState(false)
+  const [deleteId, setDeleteId] = useState(null)
   const [commentText, setCommentText] = useState('')
   const [username, setUsername] = useState('')
   const [parentId, setParentId] = useState(null)
-  const { refetch } = useGetLikesByPost(postId)
+  const { refetch, data: liked } = useGetLikesByPost(postId)
   const { data: postComments, isLoading: commentsLoading } =
     useGetPostComments(postId)
   const { mutate: follow, isPending: followPending } = useFollowUser()
@@ -42,18 +47,17 @@ const PostDialog = ({ postId }) => {
   const { data: currentUserId } = useGetMe()
   const { mutate, isPending } = useAddCommentToPost()
   const { mutate: addLike } = useAddLikeToPost()
+  const { mutate: deletePost } = useDeletePost()
+  const { mutate: deletePostMutation } = useDeletePost(postId, {
+    onSuccess: () => {
+      setOpenDialog(false)
+    }
+  }) // передаем id в useDeletePost
 
   const handleReadMoreClick = () => {
     setIsExpanded(true)
   }
 
-  const handleLike = id => {
-    console.log(`Like ${id}`)
-    addLike({
-      id: id
-    })
-    refetch()
-  }
   if (isLoading || commentsLoading) return <PostDialogSkeleton />
 
   if (!openDialog) return null
@@ -88,10 +92,16 @@ const PostDialog = ({ postId }) => {
     }
   }
 
+  const handleDelete = () => {
+    deletePostMutation()
+  }
+
+  const isLiked = liked?.some(x => x?._id === currentUserId?._id)
+
   return (
     <div className='relative'>
       <div
-        className={` max-h-full overflow-y-auto lg:overflow-y-hidden lg:min-h-[93%]  border dialog fixed left-[50%] top-[50%] z-[51]  w-full translate-x-[-50%] translate-y-[-50%] grid overflow-hidden grid-cols-1 md:grid-cols-2  rounded-2xl border-none bg-background shadow-lg duration-200 ${
+        className={` max-h-full overflow-y-auto lg:overflow-y-hidden lg:min-h-[93%]  border dialog fixed left-[50%] top-[50%] z-[50]  w-full translate-x-[-50%] translate-y-[-50%] grid overflow-hidden grid-cols-1 md:grid-cols-2  rounded-2xl border-none bg-background shadow-lg duration-200 ${
           openDialog
             ? 'opacity-100 no-scrollbar visible '
             : 'opaacity-0 invisible'
@@ -162,9 +172,23 @@ const PostDialog = ({ postId }) => {
                 <AvatarImage src={postData?.user?.avatar} />
               </Avatar>
               <div
-                className='flex  items-center
+                className='flex justify-between w-full gap-x-4  items-center
                 user'>
-                <h4 className='font-bold'>{postData?.user?.username}</h4>
+                <div className='flex items-center justify-between w-full'>
+                  <Link
+                    to={`/profile/${postData?.user?._id}`}
+                    className='font-bold'>
+                    {postData?.user?.username}
+                  </Link>
+                  {currentUserId?._id === postData?.user?._id ? (
+                    <Button
+                      onClick={handleDelete}
+                      className='ms-auto h-8 py-2 font-bold'>
+                      Delete Post
+                    </Button>
+                  ) : null}
+                </div>
+                <h4 className='font-bold'></h4>
                 {postData?.user?._id !== currentUserId._id &&
                 !currentUserId?.following.some(
                   x => x._id === postData?.user?._id
@@ -243,13 +267,20 @@ const PostDialog = ({ postId }) => {
             <div className='flex justify-start w-full border-b pb-3'>
               <div className='flex flex-row items-center justify-between gap-y-2 gap-x-2 w-6/5'>
                 <ul className='flex items-center gap-2'>
-                  <li
+                  {/* <li
                     className='cursor-pointer'
                     onClick={() => handleLike(postId)}>
-                    <span>
-                      <Heart />
-                    </span>
-                  </li>
+                    {isLiked ? (
+                      <Heart
+                        size={30}
+                        className={cn(
+                          'bg-red-500 text-white  rounded-full  p-1'
+                        )}
+                      />
+                    ) : (
+                      <Heart size={30} className={cn('rounded-full  p-1')} />
+                    )}
+                  </li> */}
                   <li className='cursor-pointer'>
                     <span>
                       <Share />
@@ -277,7 +308,7 @@ const PostDialog = ({ postId }) => {
                   onClick={() => setTogglePicker(!togglePicker)}>
                   <SmilePlus />
                   {togglePicker && (
-                    <div className='absolute top-[30%] right-0'>
+                    <div className='absolute bottom-0 left-0 right-0'>
                       <Picker data={data} />
                     </div>
                   )}
@@ -296,7 +327,7 @@ const PostDialog = ({ postId }) => {
 
       <div
         onClick={() => setOpenDialog(false)}
-        className={` no-scrollbar fixed inset-0 z-[20] bg-black/5 ${
+        className={` no-scrollbar fixed inset-0 z-[49]  bg-black/40  ${
           openDialog
             ? 'opacity-100 visible fade-in-0  animate-in'
             : 'opaacity-0 invisible fade-out-95  animate-out'

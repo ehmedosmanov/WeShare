@@ -98,9 +98,10 @@ export const deleteComment = async id => {
   }
 }
 
-export const deletePost = async id => {
+export const deletePost = async data => {
   try {
-    const res = await api.delete(`/post/delete-post/${id}`)
+    console.log(data)
+    const res = await api.delete(`/post/delete-post/${data}`)
     if (!res.data) {
       throw new Error('No data received from server')
     }

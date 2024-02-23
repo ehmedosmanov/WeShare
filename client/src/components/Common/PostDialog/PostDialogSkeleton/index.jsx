@@ -5,7 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 export const PostDialogSkeleton = () => {
   return (
     <div
-      className={`max-h-[600px] overflow-y-auto lg:overflow-y-hidden lg:max-h-[610px]  border dialog fixed left-[50%] top-[50%] z-[40]  w-full translate-x-[-50%] translate-y-[-50%] grid overflow-hidden grid-cols-1 md:grid-cols-2  rounded-2xl border-none bg-background shadow-lg duration-200  sm:rounded-lg  max-w-[300px] sm:max-w-[400px] md:max-w-[660px] lg:max-w-[820px]`}>
+      className={`max-h-[600px] overflow-y-auto lg:overflow-y-hidden lg:max-h-[610px]  border dialog fixed left-[50%] top-[50%] z-[52]  w-full translate-x-[-50%] translate-y-[-50%] grid overflow-hidden grid-cols-1 md:grid-cols-2  rounded-2xl border-none bg-background shadow-lg duration-200  sm:rounded-lg  max-w-[300px] sm:max-w-[400px] md:max-w-[660px] lg:max-w-[820px]`}>
       <div className=' w-full h-full overflow-hidden'>
         <Skeleton className={'w-[700px] h-[700px]'} />
       </div>

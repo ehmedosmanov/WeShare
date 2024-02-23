@@ -7,9 +7,9 @@ import { Button } from '@/components/ui/button'
 import useConversation from '@/hooks/use-conversation'
 import NoOneInChat from '../NoOneInChat'
 import MessageInput from '../MessageInput'
-import Message from '../Messaage'
 import Messages from '../AllMessages'
 import { AvatarFallback } from '@radix-ui/react-avatar'
+import './index.scss'
 
 const ChatMain = () => {
   const { selectedConversation, setSelectedConversation } = useConversation()
@@ -36,7 +36,7 @@ const ChatMain = () => {
             </div>
           </header>
           <div className='chat px-4 mt-3'>
-            <div className='chat-area h-full  flex flex-col'>
+            <div className='chat-area justify-between h-[75vh] flex flex-col'>
               <Messages />
               <MessageInput />
             </div>

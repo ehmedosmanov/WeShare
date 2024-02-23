@@ -96,13 +96,14 @@ export const useDeleteComment = () => {
   })
 }
 
-export const useDeletePost = () => {
+export const useDeletePost = id => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: id => deletePost(id),
-    mutationKey: ['deletePost'],
-    onSuccess: id => {
-      queryClient.invalidateQueries({ queryKey: ['post', id] })
+    mutationFn: () => deletePost(id),
+    mutationKey: ['deletePost', Number(id)],
+    onSuccess: () => {
+      toast.success('Post deleted successfully')
+      queryClient.invalidateQueries({ queryKey: ['post', Number(id)] })
     }
   })
 }

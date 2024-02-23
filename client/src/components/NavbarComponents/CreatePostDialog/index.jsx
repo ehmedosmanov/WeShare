@@ -62,8 +62,8 @@ const CreatePostDialog = ({
                 <FileUploader files={files} setFiles={setFiles} />
               </>
             )}
-            {step === 1 && <MediaPreview files={files} />}
-            {step === 2 && (
+            {/* {step === 1 && <MediaPreview files={files} />} */}
+            {step === 1 && (
               <div>
                 <span>
                   <Label htmlFor='content'>Content</Label>

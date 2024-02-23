@@ -4,7 +4,6 @@ import UserProfileHeading from '@/components/ProfileComponents/UserProfileHeadin
 import { useGetUserProfile } from '@/hooks/UsersHooks'
 import React, { lazy } from 'react'
 import { Helmet } from 'react-helmet-async'
-import { LazyLoadComponent } from 'react-lazy-load-image-component'
 import { useParams } from 'react-router-dom'
 
 const Profile = () => {

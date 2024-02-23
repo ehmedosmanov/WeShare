@@ -1,24 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Pagination, Navigation } from 'swiper/modules'
-import { Share, Heart, MessageCircle, Bookmark } from 'lucide-react'
 import ReactPlayer from 'react-player'
 import { AspectRatio } from '@radix-ui/react-aspect-ratio'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import { Avatar, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import 'swiper/css/navigation'
 import PostDialog from '@/components/Common/PostDialog'
-import { motion } from 'framer-motion'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
-import { UploadContext } from '@/context/UploadContext'
-import {
-  useAddLikeToPost,
-  useGetFollowingsPosts,
-  useGetPost
-} from '@/hooks/PostHooks'
 import useStore from '@/hooks/use-store'
 import { useGetMe } from '@/hooks/UsersHooks'
 

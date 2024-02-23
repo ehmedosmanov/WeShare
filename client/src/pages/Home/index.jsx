@@ -6,7 +6,7 @@ const Home = () => {
   return (
     <>
       <Helmet>
-        <title>Feed</title>
+        <title>Home</title>
       </Helmet>
       {/* <Stories /> */}
       <LazyLoadComponent>

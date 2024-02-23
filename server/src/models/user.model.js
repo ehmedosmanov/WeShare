@@ -29,7 +29,9 @@ const userSchema = new Schema(
     },
     avatar: {
       type: String,
-      trim: true
+      trim: true,
+      default:
+        'https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1677509740.jpg'
     },
     status: {
       type: String,

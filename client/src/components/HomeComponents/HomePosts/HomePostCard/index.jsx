@@ -119,7 +119,7 @@ const HomePostCard = ({
   useEffect(() => {
     const likedPost = post?.likes?.find(x => x?._id === currentUser?._id)
     likedPost ? setClickedByMe(true) : setClickedByMe(false)
-  }, [])
+  }, [refetch])
 
   return (
     <motion.div
@@ -136,11 +136,6 @@ const HomePostCard = ({
             </Avatar>
             <div className='flex gap-2'>
               <span>{post?.user?.username}</span>
-              <span>
-                <Button variant={'link'} className={'w-0 h-0'}>
-                  Follow
-                </Button>
-              </span>
             </div>
           </div>
         </CardHeader>
@@ -238,21 +233,26 @@ const HomePostCard = ({
         <CardFooter>
           <div className='flex flex-col justify-center  w-full'>
             <div className='flex justify-between flex-col items-start gap-y-4 '>
-              <AnimatedTooltip items={usersLikes} />
+              <span className=' cursor-pointer'>
+                <AnimatedTooltip items={usersLikes} />
+              </span>
+
               <div className='flex items-center justify-between w-full'>
                 <ul className='flex items-center gap-2'>
                   {/* <li className='flex flex-row items-center justify-center mb-10 w-full'>
                 </li> */}
                   <li className='cursor-pointer' onClick={handleLike}>
                     <span className='rounded-full bg-red-500'>
-                      <Heart
-                        size={30}
-                        color='#fff'
-                        className={cn(
-                          'bg-none  rounded-full  p-1',
-                          clickedByMe ? 'bg-red-500' : 'bg-none'
-                        )}
-                      />
+                      {clickedByMe ? (
+                        <Heart
+                          size={30}
+                          className={cn(
+                            'bg-red-500 text-white  rounded-full  p-1'
+                          )}
+                        />
+                      ) : (
+                        <Heart size={30} className={cn('rounded-full  p-1')} />
+                      )}
                     </span>
                   </li>
                   <li
@@ -312,7 +312,11 @@ const HomePostCard = ({
           </div>
         </CardFooter>
       </Card>
-      <PostDialog postId={postId} openDialog={openDialog} />
+      <PostDialog
+        clickedByMe={clickedByMe}
+        postId={postId}
+        openDialog={openDialog}
+      />
     </motion.div>
   )
 }

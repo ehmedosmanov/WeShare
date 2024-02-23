@@ -193,8 +193,8 @@ export const createPost = async (req, res) => {
 export const deletePost = async (req, res) => {
   try {
     const { id } = req.params
+    console.log(`deleting post ${id}`)
     const findPost = await Post.findById(id)
-
     if (!findPost) return res.status(404).json({ message: 'No post found' })
     await Promise.all(
       findPost.media.map(async mediaUrl => {

@@ -1,5 +1,5 @@
 import { api } from './api'
-import { toast } from 'sonner'
+
 export const getMeUser = async () => {
   try {
     const res = await api.get('/user/me')

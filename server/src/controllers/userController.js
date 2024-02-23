@@ -39,6 +39,7 @@ export const getUser = async (req, res) => {
   try {
     const currentUser = req.user
 
+    console.log(currentUser)
     const user = await User.findById(currentUser?.userId)
       .populate('following')
       .populate('followers')

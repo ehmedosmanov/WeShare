@@ -39,18 +39,6 @@ const ReplyComment = ({ replyHandle, replies, commentId, currentUserId }) => {
               {!isExpanded && replies?.content?.split(' ').length > 50 && (
                 <button onClick={handleReadMoreClick}>Read more</button>
               )}
-              {/* {replies?.content?.split(' ').map((word, index) => {
-                if (word.startsWith('@')) {
-                  const userId = word.slice(1) 
-                  return (
-                    <Link to={`/profile/${userId}`} key={index}>
-                      {word}
-                    </Link>
-                  )
-                } else {
-                  return word + ' ' // Добавьте пробел после каждого слова, чтобы они не склеивались вместе
-                }
-              })} */}
             </p>
             <div className='flex'>
               <div className='flex items-center'>

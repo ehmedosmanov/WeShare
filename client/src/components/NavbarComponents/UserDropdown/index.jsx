@@ -34,15 +34,14 @@ const UserDropdown = () => {
   const { data: currentUser, isLoading, isError, isSuccess } = useGetMe()
   const { mutate } = useLogOut()
 
-  const fallBack =
-    currentUser?.firstName?.charAt(0) + currentUser?.lastName?.charAt(0)
+  console.log('AYBLETTTTTTTTTTTTTTTTTTTTTT', currentUser)
+
   return (
     <>
       <DropdownMenu className='mr-8'>
         <DropdownMenuTrigger asChild>
           <Avatar className='border border-primary/10'>
             <AvatarImage src={currentUser?.avatar} />
-            <AvatarFallback>{fallBack.toString().toUpperCase()}</AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent className='w-56'>

@@ -37,8 +37,6 @@ const UserProfileHeading = ({ data: userProfile, isLoading, id }) => {
     setSelectedConversation(profile)
   }
 
-  const fallBack =
-    userProfile?.firstName?.charAt(0) + userProfile?.lastName?.charAt(0)
   return (
     <section id='user-profile' className=''>
       <div className='profile-heading'>

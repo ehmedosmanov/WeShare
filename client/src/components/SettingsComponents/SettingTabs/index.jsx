@@ -67,12 +67,12 @@ const SettingsTabs = () => {
         <TabsList className='grid w-full grid-cols-8'>
           <TabsTrigger value='description'>Description</TabsTrigger>
           <TabsTrigger value='password'>Password</TabsTrigger>
-          <TabsTrigger value='notification'>Notification</TabsTrigger>
-          <TabsTrigger value='avatar'>Avatar</TabsTrigger>
-          <TabsTrigger value='blocked'>Blocked</TabsTrigger>
-          <TabsTrigger value='tags'>Tags</TabsTrigger>
-          <TabsTrigger value='privacy'>Privacy</TabsTrigger>
-          <TabsTrigger value='status'>Status</TabsTrigger>
+          {/* <TabsTrigger value='notification'>Notification</TabsTrigger> */}
+          {/* <TabsTrigger value='avatar'>Avatar</TabsTrigger> */}
+          {/* <TabsTrigger value='blocked'>Blocked</TabsTrigger> */}
+          {/* <TabsTrigger value='tags'>Tags</TabsTrigger> */}
+          {/* <TabsTrigger value='privacy'>Privacy</TabsTrigger> */}
+          {/* <TabsTrigger value='status'>Status</TabsTrigger> */}
         </TabsList>
         <TabsContent value='description'>
           <Card>
