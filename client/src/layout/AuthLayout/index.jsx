@@ -20,7 +20,7 @@ const AuthLayout = () => {
           <meta name='author' content='WeShare' />
         </Helmet>
         <main>
-          <section className='h-screen flex items-center justify-center w-full'>
+          <section className=' flex items-center justify-center w-full'>
             <Outlet />
             <GridAnimations />
           </section>

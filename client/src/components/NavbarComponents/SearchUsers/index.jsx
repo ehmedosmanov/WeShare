@@ -117,7 +117,7 @@ const SearchUsers = () => {
                   className='mx-2 p-2 rounded hover:bg-accent flex justify-between items-center'>
                   <div className='flex gap-2 items-center'>
                     <Avatar>
-                      <AvatarImage src={user.avatar} />
+                      <AvatarImage src={user?.avatar} />
                     </Avatar>
                     <Link
                       className='flex items-center gap-x-2'

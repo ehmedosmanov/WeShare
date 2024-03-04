@@ -64,7 +64,7 @@ const SettingsTabs = () => {
   return (
     <section id='setting-tab'>
       <Tabs defaultValue='description' className='w-full pt-12'>
-        <TabsList className='grid w-full grid-cols-8'>
+        <TabsList className='grid w-full gap-2 grid-cols-2'>
           <TabsTrigger value='description'>Description</TabsTrigger>
           <TabsTrigger value='password'>Password</TabsTrigger>
           {/* <TabsTrigger value='notification'>Notification</TabsTrigger> */}

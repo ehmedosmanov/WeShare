@@ -1,5 +1,9 @@
 import { getObjectSignedUrl } from '../helpers/s3.js'
+import { startTwoFactorAuthentication, verifyOTP } from '../helpers/twilio.js'
+import { checkRole } from '../middleware/authenticate.js'
 import User from '../models/user.model.js'
+import sendMail from '../services/send-email.js'
+import bcrypt from 'bcrypt'
 
 export const enableTwoFactorAuthentication = async (req, res) => {
   try {
@@ -35,6 +39,26 @@ export const disableTwoFactorAuthentication = async (req, res) => {
   }
 }
 
+export const TwoFactorAuthentication = async (req, res) => {
+  const { phoneNumber } = req.body
+  try {
+    await startTwoFactorAuthentication(phoneNumber)
+    res.status(200).json({ message: 'OTP code sent successfully' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+export const verify2FAOTP = async (req, res) => {
+  const { phoneNumber, otpCode } = req.body
+  try {
+    await verifyOTP(phoneNumber, otpCode)
+    res.status(200).json({ message: 'OTP code verified successfully' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
 export const getUser = async (req, res) => {
   try {
     const currentUser = req.user
@@ -45,6 +69,13 @@ export const getUser = async (req, res) => {
       .populate('followers')
       .populate({
         path: 'conversations',
+        populate: [
+          { path: 'participants', model: 'User' },
+          { path: 'messages', model: 'Message' }
+        ]
+      })
+      .populate({
+        path: 'groups',
         populate: [
           { path: 'participants', model: 'User' },
           { path: 'messages', model: 'Message' }
@@ -65,16 +96,42 @@ export const getUser = async (req, res) => {
 
 export const getUsers = async (req, res) => {
   try {
-    const users = await User.find({}).populate('')
+    const { userId } = req.user
+    const users = await User.find().populate('')
+
+    console.log('why', userId)
+
+    const filteredUsers = users.filter(
+      user => user.verified && user._id.toString() !== userId.toString()
+    )
+
+    const avatars = filteredUsers.map(async user => {
+      const avatar = await getObjectSignedUrl(user?.avatar)
+      return { ...user._doc, avatar }
+    })
+
+    const result = await Promise.all(avatars)
+
+    res.json(result)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().populate('')
 
     const filterVerifiedUsers = users.filter(x => x.verified)
 
     const avatars = filterVerifiedUsers.map(async user => {
-      const avatarUrl = await getObjectSignedUrl(user?.avatar)
-      return { ...user._doc, avatarUrl }
+      const avatar = await getObjectSignedUrl(user?.avatar)
+      return { ...user._doc, avatar }
     })
 
     const result = await Promise.all(avatars)
+
+    console.log('getusers', result)
 
     res.json(result)
   } catch (error) {
@@ -94,7 +151,15 @@ export const searchHistory = async (req, res) => {
 
     searchHistory = searchHistory.reverse()
 
-    res.json(searchHistory)
+    const avatars = searchHistory.map(async user => {
+      const avatar = await getObjectSignedUrl(user?.avatar)
+      return { ...user._doc, avatar }
+    })
+    const result = await Promise.all(avatars)
+
+    console.log(result)
+
+    res.json(result)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
@@ -255,7 +320,17 @@ export const getUserFollowers = async (req, res) => {
     const { id } = req.params
     const user = await User.findById(id).populate('followers')
     if (!user) return res.status(404).json({ message: 'User not found' })
-    res.status(200).json(user.followers)
+
+    const followers = user.followers
+
+    const avatars = followers.map(async user => {
+      const avatar = await getObjectSignedUrl(user?.avatar)
+      return { ...user._doc, avatar }
+    })
+
+    const result = await Promise.all(avatars)
+
+    res.status(200).json(result)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
@@ -266,8 +341,180 @@ export const getUserFollowings = async (req, res) => {
     const { id } = req.params
     const user = await User.findById(id).populate('following')
     if (!user) return res.status(404).json({ message: 'User not found' })
-    res.status(200).json(user.following)
+
+    const following = user.following
+
+    const avatars = following.map(async user => {
+      const avatar = await getObjectSignedUrl(user?.avatar)
+      return { ...user._doc, avatar }
+    })
+
+    const result = await Promise.all(avatars)
+
+    res.status(200).json(result)
   } catch (error) {
     res.status(500).json({ message: error.message })
+  }
+}
+
+export const createUser = async (req, res) => {
+  try {
+    const roleCheck = checkRole(req, res, req.body.role)
+    if (roleCheck) return roleCheck
+
+    const { firstName, lastName, username, email, password } = req.body
+
+    const userExist = await User.findOne({
+      $or: [{ email: email }, { username: username }]
+    })
+
+    if (!firstName || !lastName || !username || !email || !password) {
+      return res.status(400).json({ message: 'All fields are required' })
+    }
+
+    if (userExist)
+      return res.status(409).json({ message: 'User Already Exist' })
+
+    const newUser = new User({
+      firstName,
+      lastName,
+      username,
+      email,
+      password
+    })
+
+    newUser.emailVerification()
+
+    await newUser.save()
+
+    const emailText = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Verification</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+  }
+  .container {
+    max-width: 600px;
+    margin: 50px auto;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  h2 {
+    margin-top: 0;
+  }
+  p {
+    margin-bottom: 20px;
+  }
+  .button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 5px;
+  }
+  .button:hover {
+    background-color: #0056b3;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>Email Verification</h2>
+  <p>Please click the following link to verify your email:</p>
+  <a class="button" href="${process.env.CLIENT_URL}/Auth/Verified?token=${newUser.emailVerificationToken}">Verify Email</a>
+</div>
+</body>
+</html>
+`
+
+    await sendMail(newUser.email, 'Please verify your email', emailText)
+
+    res.status(200).json({ message: 'Please Verifry Email' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+export const updateUser = async (req, res) => {
+  try {
+    const { password } = req.body
+    const { id } = req.params
+
+    console.log(passwrd)
+    s
+    const roleCheck = checkRole(req, res, req.body.role)
+    if (roleCheck) return roleCheck
+
+    if (Object.keys(req.body).length === 0) {
+      return res
+        .status(400)
+        .json({ message: 'At least one field is required to update' })
+    }
+
+    if (password) {
+      const user = await User.findById(id)
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' })
+      }
+      const isValid = await user.isValidPassword(password)
+      if (!isValid) {
+        return res.status(400).json({ message: 'Invalid password' })
+      }
+
+      req.body.password = await bcrypt.hash(password, 10)
+    }
+
+    const findAndUpdateUser = await User.findByIdAndUpdate(id, req.body, {
+      new: true
+    })
+
+    const isValidPassword = findAndUpdateUser.checkPassword(password)
+
+    if (!findAndUpdateUser) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    res.status(200).json({ message: 'User updated' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+export const deleteUser = async (req, res) => {
+  try {
+    const roleCheck = checkRole(req, res, req.body.role)
+    if (roleCheck) return roleCheck
+
+    const { id } = req.params
+    const findUser = await User.findByIdAndDelete(id)
+
+    if (!findUser) {
+      return res.status(404).json({ message: 'Not Found' })
+    }
+    res.status(200).json({ message: 'User Deleted' })
+  } catch (error) {
+    res.status(500).json({ message: 'Internal Server Error' })
+  }
+}
+
+export const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params
+    const findUser = await User.findById(id)
+    if (!findUser) return res.status(404).json({ message: 'Not Found' })
+
+    res.status(200).json(findUser)
+  } catch (error) {
+    res.status(500).json({ message: 'Error' })
   }
 }

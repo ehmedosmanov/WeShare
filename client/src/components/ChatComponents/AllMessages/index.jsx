@@ -1,20 +1,21 @@
 import { useEffect, useRef } from 'react'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { useGetMessages } from '@/hooks/ChatHooks'
 import useConversation from '@/hooks/use-conversation'
-import { AvatarImage } from '@radix-ui/react-avatar'
 import Message from '../Messaage'
+import { useGetGroupMessages } from '@/hooks/GroupChatHooks'
 
 const Messages = () => {
-  // const fallBack =
-  // currentUser?.firstName?.charAt(0) + currentUser?.lastName?.charAt(0)
   const { selectedConversation } = useConversation()
+  const isGroup = selectedConversation?.isGroup
 
-  console.log('this is not working', selectedConversation)
+  const { data: groupMessages, isLoading: isGroupLoading } = isGroup
+    ? useGetGroupMessages(selectedConversation?._id)
+    : { data: null, isLoading: false }
+  const { data: messages, isLoading } = !isGroup
+    ? useGetMessages(selectedConversation?._id)
+    : { data: null, isLoading: false }
 
-  const { data: messages, isLoading } = useGetMessages(
-    selectedConversation?._id
-  )
+  console.log('this is loading', messages)
 
   const lastMessage = useRef()
 
@@ -24,21 +25,21 @@ const Messages = () => {
     }, 100)
   }, [messages])
 
-  if (isLoading) return <h1>...Loading</h1>
+  if (isLoading || isGroupLoading) return <h1>...Loading</h1>
 
-  console.log(selectedConversation)
+  const conversationMessages = isGroup ? groupMessages : messages
 
   return (
     <>
       <div className='messages h-full  overflow-auto'>
-        {messages.length > 0 &&
-          messages.map(message => (
+        {conversationMessages?.length > 0 &&
+          conversationMessages.map(message => (
             <div ref={lastMessage} key={message?._id}>
               <Message message={message} />
             </div>
           ))}
       </div>
-      {!isLoading && messages.length === 0 && (
+      {!isLoading && conversationMessages?.length === 0 && (
         <p className='text-center text-lg flex justify-center items-center font-bold'>
           Send a message to start the conversation
         </p>

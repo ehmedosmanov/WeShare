@@ -1,16 +1,17 @@
 import { useUploadPost } from '@/hooks/PostHooks'
 import { toast } from 'sonner'
 import { createContext, useState } from 'react'
+import { useGetMe } from '@/hooks/UsersHooks'
 
 export const UploadContext = createContext()
 
 const UploadContextProvider = ({ children }) => {
   const [files, setFiles] = useState([])
   const [openDialog, setOpenDialog] = useState(false)
-
+  const { data: currentUser } = useGetMe()
   const [content, setContent] = useState()
   const [step, setStep] = useState(0)
-  const { mutate, isPending } = useUploadPost()
+  const { mutate, isPending } = useUploadPost(currentUser?._id)
 
   const handleOpen = () => {
     setOpenDialog(!openDialog)

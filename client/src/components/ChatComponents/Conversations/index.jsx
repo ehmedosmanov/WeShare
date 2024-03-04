@@ -4,19 +4,21 @@ import React, { useEffect } from 'react'
 import Conversation from '../Сonversation'
 import { useGetInbox } from '@/hooks/ChatHooks'
 import useConversation from '@/hooks/use-conversation'
+import GroupConversation from '../GroupConversation'
+import { useGetGroups } from '@/hooks/GroupChatHooks'
 
 const Conversations = () => {
-  //   const { data: userConversations } = useGetMe()
   const { selectedConversation } = useConversation()
   const { data: inbox, refetch } = useGetInbox()
+  const { data: grouos, refetch: reGroup } = useGetGroups()
 
   useEffect(() => {
     refetch()
   }, [selectedConversation])
 
   const compareByLastMessageTime = (a, b) => {
-    const lastMessageTimeA = new Date(a.updatedAt)
-    const lastMessageTimeB = new Date(b.updatedAt)
+    const lastMessageTimeA = new Date(a?.updatedAt)
+    const lastMessageTimeB = new Date(b?.updatedAt)
 
     if (lastMessageTimeA < lastMessageTimeB) {
       return 1
@@ -35,16 +37,34 @@ const Conversations = () => {
             Your Inbox Empty
           </h1>
         ) : (
-          inbox
-            ?.sort(compareByLastMessageTime)
-            .map((part, lastInd) => (
-              <Conversation
-                part={part}
-                conversations={inbox}
-                username={part?.username}
-                avatar={part?.avatar}
-              />
-            ))
+          <>
+            <div className='mb-4'>
+              <h2 className='mb-2 px-3 hidden lg:block'>Groups</h2>
+              {grouos
+                ?.filter(conversation => conversation?.isGroup)
+                ?.sort(compareByLastMessageTime)
+                .map((part, lastInd) => (
+                  <GroupConversation
+                    part={part}
+                    conversations={grouos}
+                    groupName={part?.groupName}
+                    groupAvatar={part?.groupAvatar}
+                  />
+                ))}
+            </div>
+            <h2 className='mb-2 px-3 hidden lg:block'>Users</h2>
+            {inbox
+              ?.filter(conversation => !conversation?.isGroup)
+              ?.sort(compareByLastMessageTime)
+              .map((part, lastInd) => (
+                <Conversation
+                  part={part}
+                  conversations={inbox}
+                  username={part?.username}
+                  avatar={part?.avatar}
+                />
+              ))}
+          </>
         )}
       </>
     </>

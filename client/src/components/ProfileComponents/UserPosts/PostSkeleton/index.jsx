@@ -6,7 +6,7 @@ const PostSkeleton = () => {
   return (
     <div>
       <AspectRatio ratio={1 / 1}>
-        <Skeleton className={'w-25 h-25'} />
+        <Skeleton className={'w-28 h-28'} />
       </AspectRatio>
     </div>
   )

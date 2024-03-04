@@ -66,9 +66,9 @@ const RegisterForm = () => {
         <>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className='md:w-6/12 w-10/12 lg:w-3/12 bg-background space-y-6 border border-primary-foreground py-[35px] px-[12px]  rounded-lg'>
+            className='md:w-6/12 w-10/12 lg:w-4/12 bg-background space-y-4 border border-primary-foreground my-[25px] py-[15px] px-[25px]  rounded-lg'>
             <div className='flex-col flex justify-center items-center'>
-              <div className='w-2/12 object-cover bg-primary bg-white border-primary border p-2 rounded-md '>
+              <div className='w-[65px] object-cover bg-primary bg-white border-primary border p-2 rounded-md '>
                 <LazyLoadImage
                   className='w-full'
                   alt='WeShareLogo'
@@ -85,7 +85,7 @@ const RegisterForm = () => {
                   onClick={handleClick}
                   className='px-8 py-2 border flex gap-2 border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 hover:border-slate-400 dark:hover:border-slate-500 hover:text-slate-900 mt-4 dark:hover:text-slate-300 hover:shadow transition duration-150'>
                   <LazyLoadImage
-                    className='w-6 h-6'
+                    className='w-5 h-5'
                     src='https://www.svgrepo.com/show/475656/google-color.svg'
                     alt='googleLogo'
                   />
@@ -95,12 +95,13 @@ const RegisterForm = () => {
             <span className='!mt-3 text-center w-full flex justify-center items-center after:content-[""] after:bg-secondary after:w-full after:h-[1.3px] before:content-[""] before:bg-secondary before:w-full before:h-[1.3px] before:mt-[3px] gap-2 text-muted-foreground after:mt-[3px]'>
               or
             </span>
-            <div className='flex items-center gap-6'>
+            <div className='flex items-center justify-between  gap-10'>
               <FormField
+                className='!w-full'
                 control={form.control}
                 name='firstName'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='w-full'>
                     <FormLabel>First Name</FormLabel>
                     <FormControl>
                       <Input placeholder='First Name...' {...field} />
@@ -110,10 +111,11 @@ const RegisterForm = () => {
                 )}
               />
               <FormField
+                className='w-full'
                 control={form.control}
                 name='lastName'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='w-full'>
                     <FormLabel>Last Name</FormLabel>
                     <FormControl>
                       <Input placeholder='Last Name...' {...field} />

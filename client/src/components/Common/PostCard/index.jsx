@@ -9,9 +9,8 @@ import 'swiper/css/navigation'
 import PostDialog from '@/components/Common/PostDialog'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import useStore from '@/hooks/use-store'
-import { useGetMe } from '@/hooks/UsersHooks'
 
-const PostCard = React.memo(({ post, onIntersect, isLastPost }) => {
+const PostCard = React.memo(({ post, userId, onIntersect, isLastPost }) => {
   const { postId, setPostId, openDialog, setOpenDialog } = useStore()
 
   const handleOpenPost = id => {
@@ -83,7 +82,7 @@ const PostCard = React.memo(({ post, onIntersect, isLastPost }) => {
           </Swiper>
         )}
       </AspectRatio>
-      <PostDialog postId={postId} />
+      <PostDialog userId={userId} postId={postId} />
     </div>
   )
 })

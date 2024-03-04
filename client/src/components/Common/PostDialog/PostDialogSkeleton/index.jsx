@@ -12,17 +12,13 @@ export const PostDialogSkeleton = () => {
       <div className='dialog-content overflow-hidden py-4 px-2 w-full border'>
         <div className='dialog-header border-b w-full pb-3 border-muted'>
           <div className='flex items-center gap-3 ml-2'>
-            <Skeleton className={'w-10 h-10'} />
+            <Skeleton className={'w-10 rounded-full h-10'} />
             <div
               className='flex  items-center
                   user'>
               <h4 className='font-bold'>
                 <Skeleton className={'w-4 h-4'} />
               </h4>
-              <span className='mx-1'>•</span>
-              <Button className='h-0 p-0' variant='link'>
-                Follow
-              </Button>
             </div>
           </div>
         </div>

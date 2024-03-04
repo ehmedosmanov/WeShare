@@ -16,6 +16,30 @@ import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { UploadContext } from '@/context/UploadContext'
 import axios from 'axios'
 import {
+  EmailIcon,
+  EmailShareButton,
+  FacebookShareButton,
+  GabShareButton,
+  HatenaShareButton,
+  InstapaperShareButton,
+  LineShareButton,
+  LinkedinShareButton,
+  LivejournalShareButton,
+  MailruShareButton,
+  OKShareButton,
+  PinterestShareButton,
+  PocketShareButton,
+  RedditShareButton,
+  TelegramShareButton,
+  TumblrShareButton,
+  TwitterShareButton,
+  ViberShareButton,
+  VKShareButton,
+  WhatsappIcon,
+  WhatsappShareButton,
+  WorkplaceShareButton
+} from 'react-share'
+import {
   useAddLikeToPost,
   useGetFollowingsPosts,
   useGetLikesByPost,
@@ -263,9 +287,27 @@ const HomePostCard = ({
                     </span>
                   </li>
                   <li className='cursor-pointer'>
-                    <span>
-                      <Share />
-                    </span>
+                    <Dialog>
+                      <DialogTrigger>
+                        <span>
+                          <Share />
+                        </span>
+                      </DialogTrigger>
+                      <DialogContent className='flex justify-center'>
+                        <WhatsappShareButton
+                          url='http://localhost:5173/'
+                          title={`${currentUser?.username} want Share Post with you!`}
+                          bgStyle='#000'>
+                          <WhatsappIcon size={32} round />
+                        </WhatsappShareButton>
+                        <EmailShareButton
+                          url='http://localhost:5173/'
+                          title={`${currentUser?.username} want Share Post with you!`}
+                          bgStyle='#000'>
+                          <EmailIcon size={32} round />
+                        </EmailShareButton>
+                      </DialogContent>
+                    </Dialog>
                   </li>
                 </ul>
                 <span className='cursor-pointer'>

@@ -45,9 +45,9 @@ const MainPageSidebar = () => {
                 className='flex items-center cursor-pointer border w-full border-primary/20 py-2 px-2 rounded-md'
                 onClick={() => navigate(`/profile/${x?._id}`)}>
                 <Avatar>
-                  <AvatarImage src={x?.avatarUrl} />
+                  <AvatarImage src={x?.avatar} />
                 </Avatar>
-                <h4>{x?.username}</h4>
+                <h4 className='ml-3'>{x?.username}</h4>
               </li>
             ))
           ) : (

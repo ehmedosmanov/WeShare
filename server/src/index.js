@@ -9,6 +9,7 @@ import profileRouter from './routes/profile-router.js'
 import commentRouter from './routes/comment-router.js'
 import likeRouter from './routes/like-router.js'
 import messageRouter from './routes/message-router.js'
+import groupRouter from './routes/group-router.js'
 import connectToMongoDB from './db/connectToMongoDB.js'
 import { app, server } from './socket/socket.js'
 
@@ -31,6 +32,7 @@ app.use('/api', profileRouter)
 app.use('/api', commentRouter)
 app.use('/api', likeRouter)
 app.use('/api', messageRouter)
+app.use('/api', groupRouter)
 
 server.listen(PORT, () => {
   connectToMongoDB()

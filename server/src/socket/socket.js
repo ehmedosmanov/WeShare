@@ -31,15 +31,20 @@ io.on('connection', socket => {
 
   socket.on('markMessagesAsSeen', async ({ conversationId, userId }) => {
     try {
-      await Message.updateMany(
-        { conversationId: conversationId, seen: false },
-        { $set: { seen: true } }
+      console.log('seen message sa', conversationId, userId)
+      const res = await Message.updateMany(
+        { conversationId: conversationId, receiver: userId },
+        { $set: { seen: true } },
+        { new: true }
       )
+      console.log('undefined olan', res)
       await Conversation.updateOne(
         { _id: conversationId },
         { $set: { 'lastMessage.seen': true } }
       )
-      io.to(userSocketMap[userId]).emit('messagesSeen', { conversationId })
+      io.to(userSocketMap[userId]).emit('messagesSeen', {
+        conversationId
+      })
     } catch (error) {
       console.log(error)
     }
@@ -47,6 +52,10 @@ io.on('connection', socket => {
 
   socket.on('newMessage', newMessage => {
     io.emit('newMessage', newMessage)
+  })
+
+  socket.on('newVoiceMessage', newVoiceMessage => {
+    io.emit('newVoiceMessage', newVoiceMessage)
   })
 
   socket.on('disconnect', () => {

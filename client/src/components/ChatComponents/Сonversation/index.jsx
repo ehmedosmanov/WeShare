@@ -7,15 +7,6 @@ import React, { useEffect } from 'react'
 
 const Conversation = ({ avatar, part, username }) => {
   const { selectedConversation, setSelectedConversation } = useConversation()
-  const { data: inbox, refetch: refreshInbox } = useGetInbox()
-  const { data: messages, isLoading } = useGetMessages(
-    selectedConversation?._id
-  )
-
-  // const sortedInbox = inbox.slice().sort(compareByLastMessageTime)
-
-  // const lastUser = sortedInbox[0]
-
   const { onlineUsers } = useSocketContext()
   const isSelected = selectedConversation?._id === part?._id
 
@@ -24,8 +15,6 @@ const Conversation = ({ avatar, part, username }) => {
   const handleClickConversation = user => {
     setSelectedConversation(user)
   }
-
-  console.log(selectedConversation)
 
   return (
     <>
@@ -47,7 +36,6 @@ const Conversation = ({ avatar, part, username }) => {
           )}
         </div>
         <h4 className='text-md sm:block hidden font-bold'>{username}</h4>
-        <h3>Salam</h3>
       </li>
     </>
   )

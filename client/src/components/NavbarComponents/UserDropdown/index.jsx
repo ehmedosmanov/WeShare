@@ -1,38 +1,32 @@
 import React from 'react'
-import {
-  LogOut,
-  Mail,
-  MessageSquare,
-  Plus,
-  PlusCircle,
-  Settings,
-  User,
-  UserPlus,
-  Users
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { LogOut, Settings, User, Shield } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { useGetMe } from '@/hooks/UsersHooks'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Link } from 'react-router-dom'
 import { useLogOut } from '@/hooks/AuthHooks'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const UserDropdown = () => {
   const { data: currentUser, isLoading, isError, isSuccess } = useGetMe()
   const { mutate } = useLogOut()
+
+  if (isLoading)
+    return (
+      <>
+        <Avatar className='border border-primary/10'>
+          <Skeleton className={'w-5 h-5'} />
+        </Avatar>
+      </>
+    )
 
   console.log('AYBLETTTTTTTTTTTTTTTTTTTTTT', currentUser)
 
@@ -60,14 +54,16 @@ const UserDropdown = () => {
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          {/* <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <Plus className='mr-2 h-4 w-4' />
-              <span>New Post</span>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-
-          <DropdownMenuSeparator /> */}
+          {currentUser?.role === 'Admin' ||
+          currentUser?.role === 'superAdmin' ? (
+            <Link to={'/Admin'} className=' cursor-pointer'>
+              <DropdownMenuItem>
+                <Shield className='mr-2 h-4 w-4' />
+                <span>Admin Panel</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </Link>
+          ) : null}
           <DropdownMenuItem onClick={mutate}>
             <LogOut className='mr-2 h-4 w-4' />
             <span>Log out</span>

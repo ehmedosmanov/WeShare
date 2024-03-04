@@ -1,3 +1,4 @@
+import { getObjectSignedUrl } from '../helpers/s3.js'
 import Comment from '../models/coment.model.js'
 import Post from '../models/post.model.js'
 import User from '../models/user.model.js'
@@ -10,13 +11,13 @@ const findAndPushAndSave = async (id, model, comment) => {
   return find
 }
 
-const findAndPullAndSave = async (id, model, comment) => {
-  const find = await model.findById(id)
-  if (!find) return res.status(404).json({ message: `No ${model} found` })
-  find.comments.pull(comment)
-  await find.save()
-  return find
-}
+// const findAndPullAndSave = async (id, model, comment) => {
+//   const find = await model.findById(id)
+//   if (!find) return res.status(404).json({ message: `No ${model} found` })
+//   find.comments.pull(comment)
+//   await find.save()
+//   return find
+// }
 
 const getAllComments = async postId => {
   try {
@@ -39,6 +40,10 @@ const getAllComments = async postId => {
 
       if (!comment) {
         return
+      }
+
+      if (comment.user && comment.user.avatar) {
+        comment.user.avatar = await getObjectSignedUrl(comment.user.avatar)
       }
 
       if (!parentComment) {

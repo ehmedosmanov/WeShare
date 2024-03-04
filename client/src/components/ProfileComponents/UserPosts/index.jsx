@@ -12,9 +12,11 @@ import { Pagination, Navigation } from 'swiper/modules'
 import ReactPlayer from 'react-player'
 import { useGetUserPosts } from '@/hooks/UsersHooks'
 import PostCard from '@/components/Common/PostCard'
+import PostSkeleton from './PostSkeleton'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 const UserPosts = ({ id }) => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useGetUserPosts(id)
 
   const [ref, inView] = useInView({
@@ -29,31 +31,47 @@ const UserPosts = ({ id }) => {
   }, [inView, hasNextPage, isFetchingNextPage])
 
   console.log(data)
+
   return (
     <section>
-      <div className='divider h-[2px] mt-12 w-12/12 bg-primary-foreground/90'></div>
-      <div className='posts'>
-        <div className='heading flex justify-start py-6'>
-          <h3 className='text-3xl font-bold text-primary'>Posts</h3>
-        </div>
-        <div className='posts py-4 gap-1 grid grid-cols-2 md:grid-cols-3'>
-          {data &&
-            data?.pages?.map((page, pageIndex) =>
-              page?.posts?.map((post, postIndex) => (
-                <PostCard
-                  post={post}
-                  isLoading={isLoading}
-                  key={post?._id}
-                  isLastPost={
-                    pageIndex === data.pages.length - 1 &&
-                    postIndex === page.posts.length - 1
-                  }
-                  onIntersect={ref}
-                />
-              ))
-            )}
-        </div>
-      </div>
+      <Tabs defaultValue='posts'>
+        <div className='divider h-[2px] mt-12 w-12/12 bg-primary-foreground/90'></div>
+        <TabsList className='w-6/12 items-center justify-center mx-auto my-6 grid grid-cols-2'>
+          <TabsTrigger value='posts'>Posts</TabsTrigger>
+          <TabsTrigger value='saved'>Saved</TabsTrigger>
+        </TabsList>
+        <TabsContent value='posts'>
+          <div className='posts'>
+            <div className='heading flex justify-start py-6'>
+              <h3 className='text-3xl font-bold text-primary'>Posts</h3>
+            </div>
+            <div className='posts py-4 gap-1 grid grid-cols-2 md:grid-cols-3'>
+              {data &&
+                data?.pages?.map((page, pageIndex) =>
+                  page?.posts?.map((post, postIndex) => (
+                    <PostCard
+                      userId={id}
+                      post={post}
+                      key={post?._id}
+                      isLastPost={
+                        pageIndex === data.pages.length - 1 &&
+                        postIndex === page.posts.length - 1
+                      }
+                      onIntersect={ref}
+                    />
+                  ))
+                )}
+            </div>
+          </div>
+        </TabsContent>
+        <TabsContent value='saved'>
+          <div className='saved'>
+            <div className='heading flex justify-start py-6'>
+              <h3 className='text-3xl font-bold text-primary'>Saved Posts</h3>
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
     </section>
   )
 }

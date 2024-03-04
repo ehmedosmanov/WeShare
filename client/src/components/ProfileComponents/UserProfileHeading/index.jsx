@@ -40,7 +40,7 @@ const UserProfileHeading = ({ data: userProfile, isLoading, id }) => {
   return (
     <section id='user-profile' className=''>
       <div className='profile-heading'>
-        <div className='flex md:flex-row flex-col  gap-x-16'>
+        <div className='flex md:flex-row flex-col items-center  gap-x-16'>
           <div className='max-w-[140px]  cursor-pointer rounded-full'>
             <LazyLoadImage
               className='w-full rounded-full object-contain'

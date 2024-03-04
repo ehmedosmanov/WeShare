@@ -1,22 +1,69 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useSendMessage } from '@/hooks/ChatHooks'
+import { useSendMessage, useSendVoiceMessage } from '@/hooks/ChatHooks'
+import { useGroupSendMessage } from '@/hooks/GroupChatHooks'
 import useConversation from '@/hooks/use-conversation'
 import React, { useState } from 'react'
+import { AudioRecorder } from 'react-audio-voice-recorder'
 
 const MessageInput = () => {
   const { selectedConversation } = useConversation()
   const [message, setMessage] = useState('')
+  const { mutate: sendVoice, isPending: sendPending } = useSendVoiceMessage()
   const { mutate, isPending } = useSendMessage()
+  const { mutate: sendGroupMessage, isPending: sendGroupPending } =
+    useGroupSendMessage()
+  const [audioData, setAudioData] = useState(null)
+
+  console.log(audioData)
+  const addAudioElement = blob => {
+    const url = URL.createObjectURL(blob)
+    const audio = document.createElement('audio')
+    audio.src = url
+    audio.controls = true
+    setAudioData(blob)
+  }
 
   const handleSubmit = e => {
-    if (!message) return
-    mutate({
-      message: message,
-      id: selectedConversation?._id
-    })
-    setMessage('')
+    e.preventDefault()
+    if (audioData) {
+      const formData = new FormData()
+      formData.append('voiceMessage', audioData, 'voiceMessage.webm')
+      sendVoice({
+        id: selectedConversation?._id,
+        formData: formData
+      })
+      setAudioData(null)
+    } else if (message) {
+      const isGroup = selectedConversation?.isGroup
+
+      const sendFunction = isGroup ? sendGroupMessage : mutate
+
+      sendFunction({
+        message: message,
+        id: selectedConversation?._id
+      })
+      setMessage('')
+    }
   }
+  // const handleSubmit = e => {
+  //   e.preventDefault()
+  //   if (audioData) {
+  //     const formData = new FormData()
+  //     formData.append('voiceMessage', audioData, 'voiceMessage.webm')
+  //     sendVoice({
+  //       id: selectedConversation?._id,
+  //       formData: formData
+  //     })
+  //     setAudioData(null)
+  //   } else if (message) {
+  //     mutate({
+  //       message: message,
+  //       id: selectedConversation?._id
+  //     })
+  //     setMessage('')
+  //   }
+  // }
 
   const handleKeyPress = e => {
     console.log(e.key === 'Enter')
@@ -46,12 +93,26 @@ const MessageInput = () => {
               onKeyPress={handleKeyPress}
             />
           </div>
-          <div className='flex-2 w-32 p-2 flex content-center items-center'>
-            <div className='flex-1 text-center'></div>
-            <div className='flex-1 w-full'>
-              <Button disabled={isPending} onClick={handleSubmit}>
-                Send
-              </Button>
+          <div className='flex justify-center items-center'>
+            <div className=' ml-4'>
+              <AudioRecorder
+                onRecordingComplete={addAudioElement}
+                audioTrackConstraints={{
+                  noiseSuppression: true,
+                  echoCancellation: true
+                }}
+                downloadFileExtension='webm'
+              />
+            </div>
+            <div className='w-32 p-2 flex content-center items-center'>
+              <div className='fle text-center'></div>
+              <div className='flex justify-center items-center w-full'>
+                <Button
+                  disabled={isPending || sendPending}
+                  onClick={handleSubmit}>
+                  Send
+                </Button>
+              </div>
             </div>
           </div>
         </div>

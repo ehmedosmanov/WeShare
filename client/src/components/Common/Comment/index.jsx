@@ -11,15 +11,19 @@ import {
 import moment from 'moment'
 import ReplyComment from '../ReplyComment'
 import { useDeleteComment } from '@/hooks/PostHooks'
+import CommentSkeleton from './CommentSkeleton'
 
 const Comment = ({ replyHandle, comment, currentUserId }) => {
   const [viewReply, setWiewReply] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
-  const { mutate } = useDeleteComment()
+  const [isDeleted, setIsDeleted] = useState(false)
+  const { mutate, isPending } = useDeleteComment(setIsDeleted)
 
   const handleReadMoreClick = () => {
     setIsExpanded(true)
   }
+
+  if (isPending || isDeleted) return <CommentSkeleton />
   return (
     <div className='comment p-2'>
       <div className='flex gap-2'>
@@ -56,14 +60,14 @@ const Comment = ({ replyHandle, comment, currentUserId }) => {
                 </Button>
                 <span>
                   <AlertDialog className='z-100'>
-                    {comment.user._id === currentUserId ? (
+                    {comment?.user?._id === currentUserId ? (
                       <AlertDialogTrigger asChild>
                         <Button variant='link'>• • •</Button>
                       </AlertDialogTrigger>
                     ) : null}
                     <AlertDialogContent>
                       <AlertDialogAction
-                        onClick={() => mutate(comment._id)}
+                        onClick={() => mutate(comment?._id)}
                         className='bg-red-600/70'>
                         Delete
                       </AlertDialogAction>

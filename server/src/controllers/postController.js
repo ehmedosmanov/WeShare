@@ -10,9 +10,6 @@ import sharp from 'sharp'
 import { fileTypeFromBuffer } from 'file-type'
 import User from '../models/user.model.js'
 
-//TODO: GET TAGGED POST
-//TODO: EDIT POST
-
 export const getAllPosts = async (req, res) => {
   try {
     const allPosts = await Post.find().populate('user')
@@ -20,6 +17,9 @@ export const getAllPosts = async (req, res) => {
     for (let post of allPosts) {
       for (let mediaItem of post.media) {
         mediaItem.url = await getObjectSignedUrl(mediaItem.url)
+      }
+      if (post.user && post.user.avatar) {
+        post.user.avatar = await getObjectSignedUrl(post.user.avatar)
       }
     }
 
@@ -58,6 +58,9 @@ export const getFollowingPosts = async (req, res) => {
             mediaItem.url = await getObjectSignedUrl(mediaItem.url)
           })
         )
+        if (post.user && post.user.avatar) {
+          post.user.avatar = await getObjectSignedUrl(post.user.avatar)
+        }
       })
     )
 
@@ -82,6 +85,14 @@ export const getByIdPost = async (req, res) => {
           { path: 'replies' }
         ]
       })
+
+    if (findPost.user.privateProfile) {
+      return res.status(403).json({ message: 'This post is private' })
+    }
+
+    if (findPost.user && findPost.user.avatar) {
+      findPost.user.avatar = await getObjectSignedUrl(findPost.user.avatar)
+    }
 
     for (let mediaItem of findPost.media) {
       mediaItem.url = await getObjectSignedUrl(mediaItem.url)

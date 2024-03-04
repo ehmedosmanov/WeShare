@@ -26,6 +26,60 @@ export const getUsers = async () => {
   }
 }
 
+export const createUser = async data => {
+  try {
+    const res = await api.post(`/user/createUser`, data)
+    if (!res.data) {
+      throw new Error('No data received from server')
+    }
+    return res.data
+  } catch (error) {
+    console.log(error.message)
+    throw error
+  }
+}
+
+export const deleteUsers = async id => {
+  try {
+    console.log(id)
+    const res = await api.delete(`/user/deleteUser/${id}`)
+    if (!res.data) {
+      throw new Error('No data received from server')
+    }
+    return res.data
+  } catch (error) {
+    console.log(error.message)
+    throw error
+  }
+}
+
+export const updateUser = async id => {
+  try {
+    console.log(id)
+    const res = await api.put(`/user/updateUser/${id}`)
+    if (!res.data) {
+      throw new Error('No data received from server')
+    }
+    return res.data
+  } catch (error) {
+    console.log(error.message)
+    throw error
+  }
+}
+
+export const getUserById = async id => {
+  try {
+    const res = await api.get(`/user/getUserById/${id}`)
+    if (!res.data) {
+      throw new Error('No data received from server')
+    }
+    return res.data
+  } catch (error) {
+    console.log(error.message)
+    throw error
+  }
+}
+
 export const getSearchHistotyUser = async () => {
   try {
     const res = await api.get('/user/get-history')

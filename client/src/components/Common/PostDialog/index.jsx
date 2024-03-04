@@ -23,36 +23,34 @@ import { PostDialogSkeleton } from './PostDialogSkeleton'
 import { MessageCircleMore, Heart, X, Share, SmilePlus } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import moment from 'moment'
-import { useFollowUser, useGetMe } from '@/hooks/UsersHooks'
+import { useFollowUser, useGetMe, useGetUserProfile } from '@/hooks/UsersHooks'
 import Comment from '../Comment'
 import { cn } from '@/lib/utils'
 import { XCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
-const PostDialog = ({ clickedByMe, postId }) => {
-  const { data: postData, isLoading, isFetching } = useGetPost(postId)
+const PostDialog = ({ clickedByMe, postId, userId }) => {
+  const { data: postData, isLoading } = useGetPost(postId)
   const { setOpenDialog, openDialog } = useStore()
   const [imageLoading, setImageLoading] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [togglePicker, setTogglePicker] = useState(false)
-  const [deleteId, setDeleteId] = useState(null)
   const [commentText, setCommentText] = useState('')
   const [username, setUsername] = useState('')
+  const { refetch: refetchProfile } = useGetUserProfile(userId)
   const [parentId, setParentId] = useState(null)
   const { refetch, data: liked } = useGetLikesByPost(postId)
   const { data: postComments, isLoading: commentsLoading } =
     useGetPostComments(postId)
   const { mutate: follow, isPending: followPending } = useFollowUser()
-
   const { data: currentUserId } = useGetMe()
   const { mutate, isPending } = useAddCommentToPost()
   const { mutate: addLike } = useAddLikeToPost()
-  const { mutate: deletePost } = useDeletePost()
-  const { mutate: deletePostMutation } = useDeletePost(postId, {
-    onSuccess: () => {
-      setOpenDialog(false)
-    }
-  }) // передаем id в useDeletePost
+  const { mutate: deletePostMutation, isPending: deletingPost } = useDeletePost(
+    postId,
+    userId,
+    setOpenDialog
+  )
 
   const handleReadMoreClick = () => {
     setIsExpanded(true)
@@ -96,7 +94,7 @@ const PostDialog = ({ clickedByMe, postId }) => {
     deletePostMutation()
   }
 
-  const isLiked = liked?.some(x => x?._id === currentUserId?._id)
+  // const isLiked = liked?.some(x => x?._id === currentUserId?._id)
 
   return (
     <div className='relative'>
@@ -182,6 +180,7 @@ const PostDialog = ({ clickedByMe, postId }) => {
                   </Link>
                   {currentUserId?._id === postData?.user?._id ? (
                     <Button
+                      disabled={deletingPost}
                       onClick={handleDelete}
                       className='ms-auto h-8 py-2 font-bold'>
                       Delete Post
@@ -267,20 +266,6 @@ const PostDialog = ({ clickedByMe, postId }) => {
             <div className='flex justify-start w-full border-b pb-3'>
               <div className='flex flex-row items-center justify-between gap-y-2 gap-x-2 w-6/5'>
                 <ul className='flex items-center gap-2'>
-                  {/* <li
-                    className='cursor-pointer'
-                    onClick={() => handleLike(postId)}>
-                    {isLiked ? (
-                      <Heart
-                        size={30}
-                        className={cn(
-                          'bg-red-500 text-white  rounded-full  p-1'
-                        )}
-                      />
-                    ) : (
-                      <Heart size={30} className={cn('rounded-full  p-1')} />
-                    )}
-                  </li> */}
                   <li className='cursor-pointer'>
                     <span>
                       <Share />
@@ -294,8 +279,8 @@ const PostDialog = ({ clickedByMe, postId }) => {
             </div>
             <div className='pt-1 w-full mb-2 shadow-none '>
               <div className=' flex items-center flex-row justify-between'>
-                {isPending && <MoonLoader />}
                 <Input
+                  disabled={isPending}
                   value={commentText}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyPress}
@@ -314,7 +299,8 @@ const PostDialog = ({ clickedByMe, postId }) => {
                   )}
                 </span>
                 <Button
-                  onClick={() => handleCommentSubmit}
+                  disabled={isPending}
+                  onClick={handleCommentSubmit}
                   className=''
                   variant='link'>
                   Post

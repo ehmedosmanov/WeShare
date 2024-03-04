@@ -36,15 +36,20 @@ export const useGetFollowingsPosts = () => {
   })
 }
 
-export const useUploadPost = () => {
+export const useUploadPost = userId => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: data => uploadPost(data),
     mutationKey: ['uploadPost'],
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['allPosts', 'followingsPosts']
+        queryKey: ['allPosts']
       })
+      queryClient.invalidateQueries({
+        queryKey: ['followingsPosts']
+      })
+      queryClient.invalidateQueries({ queryKey: ['userPosts', userId] })
+      queryClient.invalidateQueries({ queryKey: ['userProfile', userId] })
     }
   })
 }
@@ -96,14 +101,19 @@ export const useDeleteComment = () => {
   })
 }
 
-export const useDeletePost = id => {
+export const useDeletePost = (id, userId, setOpenDialog) => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: () => deletePost(id),
     mutationKey: ['deletePost', Number(id)],
     onSuccess: () => {
+      setOpenDialog(false)
+      console.log('deletePost', id)
+      console.log('userId', userId)
       toast.success('Post deleted successfully')
       queryClient.invalidateQueries({ queryKey: ['post', Number(id)] })
+      queryClient.invalidateQueries({ queryKey: ['userPosts', userId] })
+      queryClient.invalidateQueries({ queryKey: ['me'] })
     }
   })
 }

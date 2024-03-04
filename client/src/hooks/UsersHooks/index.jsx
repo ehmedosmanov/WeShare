@@ -1,10 +1,13 @@
 import {
   changeAvatar,
   changeUserPassword,
+  createUser,
   deleteFromSearchHistoryUser,
+  deleteUsers,
   followUser,
   getMeUser,
   getSearchHistotyUser,
+  getUserById,
   getUserFollowers,
   getUserFollowings,
   getUserPosts,
@@ -13,7 +16,8 @@ import {
   removeFromFollowers,
   saveSearchHistoryUser,
   unfollowUser,
-  updateProfile
+  updateProfile,
+  updateUser
 } from '@/services/user-service'
 import { toast } from 'sonner'
 import {
@@ -215,30 +219,60 @@ export const useUpdateAvatar = () => {
     mutationKey: ['updateAvatar'],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['me'] })
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] })
     }
   })
 }
 
-// export const useSaveSearchHistory = () => {
-//   const queryClient = useQueryClient()
-//   return useMutation({
-//     mutationFn: data => saveSearchHistoryUser(data),
-//     mutationKey: ['saveSearchHistory'],
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: ['searchHistory'] })
-//     },
-//     onError: err => {
-//       if (err.response) {
-//         const { data } = err.response
-//         if (data.error === 'User Already Exist') {
-//           return toast.error('User with this email or username already exists.')
-//         }
-//       } else {
-//         toast.error('Failed to connect to the server. Please try again later.')
-//       }
-//     }
-//   })
-// }
+export const useCreateUser = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: data => createUser(data),
+    mutationKey: ['createUser'],
+    onSuccess: data => {
+      if (data) {
+        queryClient.invalidateQueries({ queryKey: ['users'] })
+        toast.success('User created successfully')
+      }
+    },
+    onError: error => {
+      if (error) {
+        toast.error(error.response.data.message)
+      }
+    }
+  })
+}
+
+export const useGetUserById = id => {
+  return useQuery({
+    queryFn: () => getUserById(id),
+    queryKey: ['userId', id]
+  })
+}
+
+export const useUpdateUser = id => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => updateUser(id),
+    mutationKey: ['updateUser', id],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userId', id] })
+      toast.success('User Updated successfully')
+    }
+  })
+}
+
+export const useDeleteUser = id => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => deleteUsers(id),
+    mutationKey: ['deleteUser', id],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      toast.success('User deleted successfully')
+    }
+  })
+}
 
 export const useDeleteFromHistory = () => {
   const queryClient = useQueryClient()

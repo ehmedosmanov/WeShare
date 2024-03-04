@@ -30,8 +30,7 @@ const userSchema = new Schema(
     avatar: {
       type: String,
       trim: true,
-      default:
-        'https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1677509740.jpg'
+      default: 'default-avatar-profile-icon-social-600nw-1677509740.webp'
     },
     status: {
       type: String,
@@ -47,15 +46,18 @@ const userSchema = new Schema(
     emailVerificationExpires: { type: Date },
     forgetPasswordToken: { type: String },
     forgetPasswordExpires: { type: Date },
+    isActive: { type: Boolean, default: true },
     otpCode: { type: String },
     otpCodeExpires: { type: Date },
     verified: { type: Boolean, default: false },
     following: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     followers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    requests: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    subscriptionRequests: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    subscriptions: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     posts: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
     likes: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
     conversations: [{ type: Schema.Types.ObjectId, ref: 'Conversation' }],
+    groups: [{ type: Schema.Types.ObjectId, ref: 'Conversation' }],
     comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
     blockedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     NotifyMeSettings: {
@@ -70,9 +72,12 @@ const userSchema = new Schema(
     privateProfile: { type: Boolean, default: false },
     searchHistory: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     savedPosts: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
-    tagged: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
     googleId: { type: String },
-    role: { type: String, enum: ['Admin', 'User'], default: 'User' }
+    role: {
+      type: String,
+      enum: ['Admin', 'User', 'superAdmin'],
+      default: 'User'
+    }
   },
   { timestamps: true }
 )

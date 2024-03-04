@@ -4,8 +4,6 @@ import React, { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { toast } from 'sonner'
 const PrivateRoute = ({ component: Component, publicOnly, ...rest }) => {
-  //TODO: Auth Logic
-
   const { data, isLoading, isSuccess, isError } = useIsAuth()
   console.log(data)
 

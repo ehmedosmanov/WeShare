@@ -151,3 +151,22 @@ export const changeAvatar = async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 }
+
+export const enableUserPrivacy = async (req, res) => {
+  try {
+    const { userId } = req.user
+
+    const findUser = await User.findById(userId)
+
+    if (!findUser) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    findUser.privateProfile = !findUser.privateProfile
+    await findUser.save()
+
+    return res.status(200).json({ message: 'User privacy has been updated' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
