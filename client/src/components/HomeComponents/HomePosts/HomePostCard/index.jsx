@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Pagination } from 'swiper/modules'
 import { Share, Heart, MessageCircle, Bookmark } from 'lucide-react'
@@ -7,37 +7,18 @@ import { AspectRatio } from '@radix-ui/react-aspect-ratio'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { useQueryClient } from '@tanstack/react-query'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import PostDialog from '@/components/Common/PostDialog'
 import { motion } from 'framer-motion'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
-import { UploadContext } from '@/context/UploadContext'
-import axios from 'axios'
+import { IoMdHeart } from 'react-icons/io'
+
 import {
   EmailIcon,
   EmailShareButton,
-  FacebookShareButton,
-  GabShareButton,
-  HatenaShareButton,
-  InstapaperShareButton,
-  LineShareButton,
-  LinkedinShareButton,
-  LivejournalShareButton,
-  MailruShareButton,
-  OKShareButton,
-  PinterestShareButton,
-  PocketShareButton,
-  RedditShareButton,
-  TelegramShareButton,
-  TumblrShareButton,
-  TwitterShareButton,
-  ViberShareButton,
-  VKShareButton,
   WhatsappIcon,
-  WhatsappShareButton,
-  WorkplaceShareButton
+  WhatsappShareButton
 } from 'react-share'
 import {
   useAddLikeToPost,
@@ -60,6 +41,10 @@ import { Link } from 'react-router-dom'
 import UnFollowBtn from '@/components/Common/UnFollowBtn'
 import { api } from '@/services/api'
 import { cn } from '@/lib/utils'
+import { Modal } from '@/components/ui/modal'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { savePost } from '@/services/post-service'
+import { FaBookmark } from 'react-icons/fa'
 
 const HomePostCard = ({
   post,
@@ -94,17 +79,44 @@ const HomePostCard = ({
   const [clickedByMe, setClickedByMe] = useState(null)
   // const { data: likes, i } = useGetPost(post._id)
   const [isLiked, setIsLiked] = useState(null)
+  const [isSaved, setIsSaved] = useState(false)
+  const queryClient = useQueryClient()
+  const { mutateAsync } = useMutation({
+    mutationFn: savePost,
+    mutationKey: ['save-post', post?._id],
+    onMutate: async id => {
+      await queryClient.refetchQueries(['me'])
+      await queryClient.refetchQueries(['userSavedPosts', currentUser?._id])
+      await queryClient.cancelQueries(['post', id])
+      const previousPost = queryClient.getQueryData(['post', id])
+      return { previousPost }
+    },
+    onError: (err, id, context) => {
+      queryClient.setQueryData(['post', id], context.previousPost)
+    },
+    onSettled: (data, error, id) => {
+      if (data) {
+        queryClient.setQueryData(['post', id], data)
+      }
+    }
+  })
 
-  const handleOpenPost = id => {
-    setPostId(id)
-    setId(id)
-    setOpenDialog(true)
-  }
+  const handleOpenPost = useCallback(
+    id => {
+      setPostId(id)
+      setId(id)
+      setOpenDialog(true)
+    },
+    [setPostId, setId, setOpenDialog]
+  )
+
+  console.log('IS SAVED', isSaved)
 
   const handleLike = async () => {
+    setIsLiked(current => !current)
     try {
-      const res = await axios.post(
-        'http://localhost:8000/api/like/like-post',
+      const res = await api.post(
+        '/like/like-post',
         { id: post?._id },
         {
           withCredentials: true
@@ -113,12 +125,9 @@ const HomePostCard = ({
       if (!res.data) {
         throw new Error('No data received from server')
       }
-      const likedPost = await axios.get(
-        `http://localhost:8000/api/post/get-post/${post?._id}`,
-        {
-          withCredentials: true
-        }
-      )
+      const likedPost = await api.get(`/post/get-post/${post?._id}`, {
+        withCredentials: true
+      })
       console.log(likedPost)
       const likedPostData = likedPost.data
       setPostLikes(likedPostData?.likes)
@@ -129,10 +138,32 @@ const HomePostCard = ({
     }
   }
 
+  const handleSave = async id => {
+    setIsSaved(current => !current)
+    await mutateAsync(id, {
+      onError: () => {
+        setIsSaved(current => !current)
+      },
+      onSuccess: data => {
+        const isPostSaved = data.savedPosts?.some(
+          savedPostId => savedPostId === id
+        )
+        setIsSaved(isPostSaved)
+      }
+    })
+  }
+
   useEffect(() => {
     setIsLiked(post.likes.includes(currentUser?._id))
     setPostLike(post.likes.length)
   }, [])
+
+  useEffect(() => {
+    const isPostSaved = currentUser?.savedPosts?.some(
+      savedPostId => savedPostId === post._id
+    )
+    setIsSaved(isPostSaved)
+  }, [currentUser, post._id])
 
   useEffect(() => {
     postLikes?.includes(currentUser?._id)
@@ -143,7 +174,7 @@ const HomePostCard = ({
   useEffect(() => {
     const likedPost = post?.likes?.find(x => x?._id === currentUser?._id)
     likedPost ? setClickedByMe(true) : setClickedByMe(false)
-  }, [refetch])
+  }, [refetch, currentUser?._id])
 
   return (
     <motion.div
@@ -153,16 +184,18 @@ const HomePostCard = ({
       animate='visible'
       transition={{ duration: 0.5 }}>
       <Card key={post?._id} ref={isLastPost ? onIntersect : null} className=''>
-        <CardHeader>
-          <div className='flex items-center gap-2'>
-            <Avatar>
-              <AvatarImage src={post?.user?.avatar} />
-            </Avatar>
-            <div className='flex gap-2'>
-              <span>{post?.user?.username}</span>
+        <Link to={`/profile/${post?.user?._id}`}>
+          <CardHeader>
+            <div className='flex items-center gap-2'>
+              <Avatar>
+                <AvatarImage src={post?.user?.avatar} />
+              </Avatar>
+              <div className='flex gap-2'>
+                <span>{post?.user?.username}</span>
+              </div>
             </div>
-          </div>
-        </CardHeader>
+          </CardHeader>
+        </Link>
         <CardContent>
           {post.media.length === 1 ? (
             <>
@@ -268,11 +301,10 @@ const HomePostCard = ({
                   <li className='cursor-pointer' onClick={handleLike}>
                     <span className='rounded-full bg-red-500'>
                       {clickedByMe ? (
-                        <Heart
-                          size={30}
-                          className={cn(
-                            'bg-red-500 text-white  rounded-full  p-1'
-                          )}
+                        <IoMdHeart
+                          className=' duration-300 transition-colors'
+                          size={28}
+                          fill='red'
                         />
                       ) : (
                         <Heart size={30} className={cn('rounded-full  p-1')} />
@@ -310,8 +342,10 @@ const HomePostCard = ({
                     </Dialog>
                   </li>
                 </ul>
-                <span className='cursor-pointer'>
-                  <Bookmark />
+                <span
+                  onClick={() => handleSave(post?._id)}
+                  className='cursor-pointer'>
+                  {isSaved ? <FaBookmark size={24} /> : <Bookmark />}
                 </span>
               </div>
             </div>

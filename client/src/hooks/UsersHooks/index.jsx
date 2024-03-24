@@ -26,6 +26,7 @@ import {
   useMutation,
   useQueryClient
 } from '@tanstack/react-query'
+import { api } from '@/services/api'
 
 export const useGetMe = () => {
   return useQuery({
@@ -209,6 +210,23 @@ export const useGetUserPosts = id => {
     getNextPageParam: (lastPage, allPages) =>
       lastPage.nextPage ? lastPage.nextPage : false,
     refetchOnWindowFocus: true
+  })
+}
+
+export const useGetUserSavedPosts = userId => {
+  return useInfiniteQuery({
+    queryKey: ['userSavedPosts', userId],
+    staleTime: 2000 * 60,
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await api.get(`/user/saved-posts/?page=${pageParam}`)
+      if (!response.data) {
+        throw new Error('No data received from server')
+      }
+      return response.data
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.nextPage ?? false
+    }
   })
 }
 

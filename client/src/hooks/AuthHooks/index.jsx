@@ -74,6 +74,7 @@ export const useLogOut = () => {
       console.log(data.data.message)
       navigate('/auth/login')
       queryClient.invalidateQueries({ queryKey: ['status'] })
+      queryClient.removeQueries({ queryKey: ['me'] })
       queryClient.setQueryData(['status'], { isAuthenticated: false })
     }
   })

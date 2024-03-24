@@ -114,7 +114,6 @@ export const deletePost = async data => {
 
 export const addLikeToPost = async id => {
   try {
-    console.log('bura catr', id)
     const res = await api.post('/like/like-post', id)
     if (!res.data) {
       throw new Error('No data received from server')
@@ -130,6 +129,20 @@ export const getLikesFromPost = async id => {
   try {
     console.log('likes', id)
     const res = await api.get(`/like/get-likes/${id}`)
+    if (!res.data) {
+      throw new Error('No data received from server')
+    }
+    return res.data
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
+}
+
+export const savePost = async id => {
+  try {
+    console.log('bura catr save id', id)
+    const res = await api.post(`/like/save-post/`, { id })
     if (!res.data) {
       throw new Error('No data received from server')
     }

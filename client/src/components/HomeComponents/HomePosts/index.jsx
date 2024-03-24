@@ -14,11 +14,6 @@ const HomePosts = () => {
   const [activeVideo, setActiveVideo] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
 
-  const variants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0 }
-  }
-
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1
@@ -36,7 +31,7 @@ const HomePosts = () => {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage()
     }
-  }, [inView, hasNextPage, isFetchingNextPage])
+  }, [inView, hasNextPage, fetchNextPage, isFetchingNextPage])
 
   const swiperRef = useRef(null)
 

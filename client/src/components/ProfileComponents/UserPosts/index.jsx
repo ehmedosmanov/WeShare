@@ -14,10 +14,13 @@ import { useGetUserPosts } from '@/hooks/UsersHooks'
 import PostCard from '@/components/Common/PostCard'
 import PostSkeleton from './PostSkeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import UserSavedPosts from '../UserSavedPosts'
 
 const UserPosts = ({ id }) => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useGetUserPosts(id)
+  //   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+  // useGetUserPosts(id)
 
   const [ref, inView] = useInView({
     triggerOnce: false,
@@ -68,6 +71,24 @@ const UserPosts = ({ id }) => {
           <div className='saved'>
             <div className='heading flex justify-start py-6'>
               <h3 className='text-3xl font-bold text-primary'>Saved Posts</h3>
+            </div>
+            <div className='posts py-4 gap-1 grid grid-cols-2 md:grid-cols-3'>
+              {/* {data &&
+                data?.pages?.map((page, pageIndex) =>
+                  page?.posts?.map((post, postIndex) => (
+                    <PostCard
+                      userId={id}
+                      post={post}
+                      key={post?._id}
+                      isLastPost={
+                        pageIndex === data.pages.length - 1 &&
+                        postIndex === page.posts.length - 1
+                      }
+                      onIntersect={ref}
+                    />
+                  ))
+                )} */}
+              <UserSavedPosts id={id} />
             </div>
           </div>
         </TabsContent>

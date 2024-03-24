@@ -65,7 +65,7 @@ const LoginForm = () => {
         <>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className='md:w-6/12 w-10/12 lg:w-3/12 bg-background space-y-6 border border-primary-foreground py-[35px] px-[28px] rounded-lg'>
+            className='md:w-6/12 w-10/12 lg:w-3/12 bg-background space-y-6 border border-primary-foreground py-[35px] px-[28px] rounded-lg shadow-md h-[90vh]'>
             {/*bg-primary  text-black*/}
             <div className='flex-col flex justify-center items-center'>
               <div className='w-2/12 object-cover bg-primary bg-white border-primary border p-2 rounded-md '>

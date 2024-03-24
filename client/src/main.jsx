@@ -35,7 +35,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <App />
           </SocketContextProvider>
         </UploadContextProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
+        {/* <ReactQueryDevtools initialIsOpen={false} /> */}
       </QueryClientProvider>
     </ThemeProvider>
   </HelmetProvider>

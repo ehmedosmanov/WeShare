@@ -74,6 +74,51 @@ export const getUserPosts = async (req, res) => {
   }
 }
 
+export const getUserSavedPosts = async (req, res) => {
+  try {
+    const currentUser = req.user
+    const limit = 6
+    const page = req.query.page ? parseInt(req.query.page) : 1
+    const skip = (page - 1) * limit
+    const userWithSavedPosts = await User.findById(
+      currentUser?.userId
+    ).populate({
+      path: 'savedPosts',
+      model: 'Post',
+      options: {
+        skip: skip,
+        limit: limit,
+        sort: { createdAt: -1 }
+      },
+      populate: {
+        path: 'user likes comments',
+        model: 'User'
+      }
+    })
+
+    if (!userWithSavedPosts) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    // Предполагается, что функция getObjectSignedUrl получает URL с подписью для доступа к медиа
+    await Promise.all(
+      userWithSavedPosts.savedPosts.map(async post => {
+        await Promise.all(
+          post.media.map(async mediaItem => {
+            mediaItem.url = await getObjectSignedUrl(mediaItem.url)
+          })
+        )
+      })
+    )
+
+    res
+      .status(200)
+      .json({ posts: userWithSavedPosts.savedPosts, nextPage: page + 1 })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
 export const updateProfile = async (req, res) => {
   try {
     const { id, data } = req.body

@@ -1,4 +1,5 @@
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useSocketContext } from '@/context/SocketContext'
 import { useGetInbox, useGetMessages } from '@/hooks/ChatHooks'
 import useConversation from '@/hooks/use-conversation'
@@ -42,3 +43,24 @@ const Conversation = ({ avatar, part, username }) => {
 }
 
 export default Conversation
+
+export const ConversationSkeleton = () => {
+  return (
+    <>
+      <li
+        className={cn(
+          'flex cursor-pointer items-center gap-x-3 px-2 border-y py-3'
+        )}>
+        <div className='w-10 h-10 relative'>
+          <Avatar>
+            <Skeleton className={'w-10 h-10'} />
+          </Avatar>
+        </div>
+        <h4 className='text-md sm:block hidden font-bold'>
+          <Skeleton className={'w-20 h-2 mb-2'} />
+          <Skeleton className={'w-16 h-2'} />
+        </h4>
+      </li>
+    </>
+  )
+}

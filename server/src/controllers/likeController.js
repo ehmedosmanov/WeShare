@@ -55,3 +55,41 @@ export const showLikeByPost = async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 }
+
+export const savePost = async (req, res) => {
+  try {
+    const { id } = req.body
+    console.log('save this', req.body)
+    const { userId } = req.user
+    const findUser = await User.findById(userId)
+    if (!findUser) return res.status(404).json({ message: 'User not found' })
+    const postIndex = findUser.savedPosts.indexOf(id)
+
+    if (postIndex > -1) {
+      findUser.savedPosts.splice(postIndex, 1)
+    } else {
+      findUser.savedPosts.push(id)
+    }
+    await findUser.save()
+    res.status(200).json(findUser)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+export const getSavedPostsByUser = async (req, res) => {
+  try {
+    const { userId } = req.user
+    const userWithSavedPosts = await User.findById(userId).populate(
+      'savedPosts'
+    )
+
+    if (!userWithSavedPosts) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    res.status(200).json(userWithSavedPosts.savedPosts)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}

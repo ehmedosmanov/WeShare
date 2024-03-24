@@ -1,7 +1,7 @@
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { useGetMe } from '@/hooks/UsersHooks'
 import React, { useEffect } from 'react'
-import Conversation from '../Сonversation'
+import Conversation, { ConversationSkeleton } from '../Сonversation'
 import { useGetInbox } from '@/hooks/ChatHooks'
 import useConversation from '@/hooks/use-conversation'
 import GroupConversation from '../GroupConversation'
@@ -9,7 +9,7 @@ import { useGetGroups } from '@/hooks/GroupChatHooks'
 
 const Conversations = () => {
   const { selectedConversation } = useConversation()
-  const { data: inbox, refetch } = useGetInbox()
+  const { data: inbox, refetch, isLoading } = useGetInbox()
   const { data: grouos, refetch: reGroup } = useGetGroups()
 
   useEffect(() => {
@@ -39,8 +39,8 @@ const Conversations = () => {
         ) : (
           <>
             <div className='mb-4'>
-              <h2 className='mb-2 px-3 hidden lg:block'>Groups</h2>
-              {grouos
+              {/* <h2 className='mb-2 px-3 hidden lg:block'>Groups</h2> */}
+              {/* {grouos
                 ?.filter(conversation => conversation?.isGroup)
                 ?.sort(compareByLastMessageTime)
                 .map((part, lastInd) => (
@@ -50,20 +50,24 @@ const Conversations = () => {
                     groupName={part?.groupName}
                     groupAvatar={part?.groupAvatar}
                   />
-                ))}
+                ))} */}
             </div>
             <h2 className='mb-2 px-3 hidden lg:block'>Users</h2>
-            {inbox
-              ?.filter(conversation => !conversation?.isGroup)
-              ?.sort(compareByLastMessageTime)
-              .map((part, lastInd) => (
-                <Conversation
-                  part={part}
-                  conversations={inbox}
-                  username={part?.username}
-                  avatar={part?.avatar}
-                />
-              ))}
+            {isLoading ? (
+              <ConversationSkeleton />
+            ) : (
+              inbox
+                ?.filter(conversation => !conversation?.isGroup)
+                ?.sort(compareByLastMessageTime)
+                .map((part, lastInd) => (
+                  <Conversation
+                    part={part}
+                    conversations={inbox}
+                    username={part?.username}
+                    avatar={part?.avatar}
+                  />
+                ))
+            )}
           </>
         )}
       </>

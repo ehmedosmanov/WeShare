@@ -23,12 +23,17 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import ChangePasswordTab from '../ChangePassword'
-
+import { MoonLoader } from 'react-spinners'
 const SettingsTabs = () => {
   const { data: currentUser, isLoading } = useGetMe()
   const [isChanged, setIsChanged] = useState(false)
 
-  if (isLoading) return <h1>...Loading</h1>
+  if (isLoading)
+    return (
+      <span className='flex justify-center items-center h-full'>
+        <MoonLoader size={28} />
+      </span>
+    )
 
   console.log(currentUser)
 

@@ -9,6 +9,7 @@ import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { ModeToggle } from '@/components/Common/mode-toggle'
 import Hamburger from 'hamburger-react'
 import UserDropdown from '../UserDropdown'
+import { Link } from 'react-router-dom'
 
 const MainNav = () => {
   const { data: currentUser, isLoading, isError, isSuccess } = useGetMe()
@@ -26,16 +27,18 @@ const MainNav = () => {
             {/* <span className='md:hidden block'>
               <Hamburger toggled={isOpen} toggle={setOpen} />
             </span> */}
-            <div className=' items-center flex'>
-              <div className='w-[50px]  bg-primary bg-white border-primary border p-2 rounded-md '>
-                <LazyLoadImage
-                  className='w-full'
-                  alt='WeShareLogo'
-                  src={Logo}
-                />
+            <Link className='flex ' to={'/'}>
+              <div className=' items-center flex'>
+                <div className='w-[50px]  bg-primary bg-white border-primary border p-2 rounded-md '>
+                  <LazyLoadImage
+                    className='w-full'
+                    alt='WeShareLogo'
+                    src={Logo}
+                  />
+                </div>
+                <h3 className='text-primary pl-3 text-xl font-bold'>WeShare</h3>
               </div>
-              <h3 className='text-primary pl-3 text-xl font-bold'>WeShare</h3>
-            </div>
+            </Link>
           </div>
           <SearchUsers />
           <ul className='flex items-center'>

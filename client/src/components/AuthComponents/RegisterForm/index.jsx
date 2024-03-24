@@ -66,7 +66,7 @@ const RegisterForm = () => {
         <>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className='md:w-6/12 w-10/12 lg:w-4/12 bg-background space-y-4 border border-primary-foreground my-[25px] py-[15px] px-[25px]  rounded-lg'>
+            className='md:w-6/12 w-10/12 lg:w-4/12 bg-background space-y-4 border border-primary-foreground my-[25px] py-[15px] px-[25px] shadow-lg h-[98vh] rounded-lg'>
             <div className='flex-col flex justify-center items-center'>
               <div className='w-[65px] object-cover bg-primary bg-white border-primary border p-2 rounded-md '>
                 <LazyLoadImage

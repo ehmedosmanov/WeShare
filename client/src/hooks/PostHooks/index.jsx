@@ -15,6 +15,7 @@ import {
   getLikesFromPost,
   getPost,
   getPostComments,
+  savePost,
   uploadPost
 } from '@/services/post-service'
 
@@ -133,6 +134,14 @@ export const useAddLikeToPost = () => {
     }
   })
 }
+
+// export const useGetSavedPosts = id => {
+//   return useQuery({
+//     queryFn: () => getLikesFromPost(id),
+//     staleTime: 1000 * 60 * 3,
+//     queryKey: ['postLikes', id]
+//   })
+// }
 
 export const useGetLikesByPost = id => {
   return useQuery({

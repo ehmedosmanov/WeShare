@@ -3,7 +3,7 @@ import { useGetMessages } from '@/hooks/ChatHooks'
 import useConversation from '@/hooks/use-conversation'
 import Message from '../Messaage'
 import { useGetGroupMessages } from '@/hooks/GroupChatHooks'
-
+import { MoonLoader } from 'react-spinners'
 const Messages = () => {
   const { selectedConversation } = useConversation()
   const isGroup = selectedConversation?.isGroup
@@ -25,7 +25,12 @@ const Messages = () => {
     }, 100)
   }, [messages])
 
-  if (isLoading || isGroupLoading) return <h1>...Loading</h1>
+  if (!isLoading || isGroupLoading)
+    return (
+      <span className='flex justify-center items-center h-full'>
+        <MoonLoader size={28} />
+      </span>
+    )
 
   const conversationMessages = isGroup ? groupMessages : messages
 

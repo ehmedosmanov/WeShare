@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Pagination } from 'swiper/modules'
@@ -37,9 +37,7 @@ const PostDialog = ({ clickedByMe, postId, userId }) => {
   const [togglePicker, setTogglePicker] = useState(false)
   const [commentText, setCommentText] = useState('')
   const [username, setUsername] = useState('')
-  const { refetch: refetchProfile } = useGetUserProfile(userId)
   const [parentId, setParentId] = useState(null)
-  const { refetch, data: liked } = useGetLikesByPost(postId)
   const { data: postComments, isLoading: commentsLoading } =
     useGetPostComments(postId)
   const { mutate: follow, isPending: followPending } = useFollowUser()
@@ -56,18 +54,20 @@ const PostDialog = ({ clickedByMe, postId, userId }) => {
     setIsExpanded(true)
   }
 
-  if (isLoading || commentsLoading) return <PostDialogSkeleton />
+  useEffect(() => {
+    if (openDialog) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'auto'
+    }
 
-  if (!openDialog) return null
+    return () => {
+      document.body.style.overflow = 'auto'
+    }
+  }, [openDialog])
 
-  const handleInputChange = e => {
-    setCommentText(e.target.value)
-  }
-
-  const handleCommentSubmit = () => {
+  const handleCommentSubmit = useCallback(() => {
     if (!commentText.trim()) return
-    console.log(`Parent ${parentId}`)
-    console.log(`Comment ${commentText}`)
     mutate({
       postId: postId,
       content: commentText,
@@ -75,6 +75,14 @@ const PostDialog = ({ clickedByMe, postId, userId }) => {
     })
     setCommentText('')
     setParentId(null)
+  }, [commentText, postId, parentId, mutate])
+
+  if (isLoading || commentsLoading) return <PostDialogSkeleton />
+
+  if (!openDialog) return null
+
+  const handleInputChange = e => {
+    setCommentText(e.target.value)
   }
 
   const replyHandle = (username, commentId) => {
@@ -99,7 +107,7 @@ const PostDialog = ({ clickedByMe, postId, userId }) => {
   return (
     <div className='relative'>
       <div
-        className={` max-h-full overflow-y-auto lg:overflow-y-hidden lg:min-h-[93%]  border dialog fixed left-[50%] top-[50%] z-[50]  w-full translate-x-[-50%] translate-y-[-50%] grid overflow-hidden grid-cols-1 md:grid-cols-2  rounded-2xl border-none bg-background shadow-lg duration-200 ${
+        className={` max-h-full overflow-y-auto lg:overflow-y-hidden lg:min-h-[93%]  border dialog fixed left-[50%] top-[50%] z-[65]  w-full translate-x-[-50%] translate-y-[-50%] grid overflow-hidden grid-cols-1 md:grid-cols-2  rounded-2xl border-none bg-background shadow-lg duration-200 ${
           openDialog
             ? 'opacity-100 no-scrollbar visible '
             : 'opaacity-0 invisible'
@@ -313,14 +321,14 @@ const PostDialog = ({ clickedByMe, postId, userId }) => {
 
       <div
         onClick={() => setOpenDialog(false)}
-        className={` no-scrollbar fixed inset-0 z-[49]  bg-black/40  ${
+        className={` no-scrollbar fixed inset-0 z-[52]  bg-black/10  ${
           openDialog
             ? 'opacity-100 visible fade-in-0  animate-in'
             : 'opaacity-0 invisible fade-out-95  animate-out'
         }`}>
         <span
           onClick={() => setOpenDialog(false)}
-          className='text-xl absolute top-6 right-6'>
+          className='text-xl cursor-pointer text-white dark:text-dark absolute top-6 right-6'>
           <X />
         </span>
       </div>
