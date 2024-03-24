@@ -13,6 +13,7 @@ import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import useOpenSearch from '@/hooks/use-open-search'
 import {
   CommandDialog,
+  CommandEmpty,
   CommandInput,
   CommandList
 } from '@/components/ui/command'
