@@ -1,15 +1,15 @@
 import { useGetUserFollowings } from '@/hooks/UsersHooks'
 import { useState } from 'react'
+import { useParams } from 'react-router-dom'
+import React from 'react'
+import { useToggleFollowings } from '@/hooks/use-toggle-followers'
+import UserFollowingsList from './UserFollowingList'
 import {
   CommandDialog,
   CommandEmpty,
   CommandInput,
   CommandList
-} from '@/components/ui/Command'
-import { useParams } from 'react-router-dom'
-import React from 'react'
-import { useToggleFollowings } from '@/hooks/use-toggle-followers'
-import UserFollowingsList from './UserFollowingList'
+} from '@/components/ui/command'
 
 const UserFollowings = () => {
   const { id } = useParams()
