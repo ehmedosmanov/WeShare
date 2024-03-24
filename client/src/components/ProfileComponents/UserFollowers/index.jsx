@@ -17,17 +17,6 @@ const UserFollowers = () => {
   const [query, setQuery] = useState('')
   const { open, setOpen } = useToggleFollowers()
 
-  // useEffect(() => {
-  //   if (query.trim()) {
-  //     const filteredUsers = userFollowers?.filter(user =>
-  //       user?.username.trim().toLowerCase().includes(query.trim().toLowerCase())
-  //     )
-  //     setSearchedUsers(filteredUsers)
-  //   } else {
-  //     setSearchedUsers([])
-  //   }
-  // }, [query])
-
   return (
     <>
       <CommandDialog open={open} onOpenChange={setOpen}>
