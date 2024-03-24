@@ -1,4 +1,3 @@
-import UserFollowers from '@/components/ProfileComponents/UserFollowers'
 import UserPosts from '@/components/ProfileComponents/UserPosts'
 import UserProfileHeading from '@/components/ProfileComponents/UserProfileHeading'
 import { useGetUserProfile } from '@/hooks/UsersHooks'

@@ -327,13 +327,13 @@ const HomePostCard = ({
                       </DialogTrigger>
                       <DialogContent className='flex justify-center'>
                         <WhatsappShareButton
-                          url='http://localhost:5173/'
+                          url='https://we-share-nu.vercel.app/'
                           title={`${currentUser?.username} want Share Post with you!`}
                           bgStyle='#000'>
                           <WhatsappIcon size={32} round />
                         </WhatsappShareButton>
                         <EmailShareButton
-                          url='http://localhost:5173/'
+                          url='https://we-share-nu.vercel.app/'
                           title={`${currentUser?.username} want Share Post with you!`}
                           bgStyle='#000'>
                           <EmailIcon size={32} round />

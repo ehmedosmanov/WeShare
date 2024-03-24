@@ -8,15 +8,14 @@ import {
 import { useState, useEffect } from 'react'
 import { BadgeCheck, Lock, Search, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import {
-  CommandDialog,
-  CommandEmpty,
-  CommandInput,
-  CommandList
-} from '@/components/ui/Command'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import useOpenSearch from '@/hooks/use-open-search'
+import {
+  CommandDialog,
+  CommandInput,
+  CommandList
+} from '@/components/ui/command'
 const SearchUsers = () => {
   const { data: users, isLoading, isSuccess } = useGetUsers()
   const { mutate: deleteHisotory, isPending } = useDeleteFromHistory()
