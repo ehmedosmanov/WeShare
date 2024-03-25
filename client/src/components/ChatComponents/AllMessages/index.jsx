@@ -25,7 +25,7 @@ const Messages = () => {
     }, 100)
   }, [messages])
 
-  if (!isLoading || isGroupLoading)
+  if (isLoading || isGroupLoading)
     return (
       <span className='flex justify-center items-center h-full'>
         <MoonLoader size={28} />
