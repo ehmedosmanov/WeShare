@@ -51,7 +51,6 @@ WeShare is A full-stack Social Media App project built with React, Node.js, Expr
 
 #### Authentication and Security:
 - **JWT**: for Secures user sessions.
-- **JWT**: for Secures user sessions.
 
 #### Data Management:
 - **React Query**: Manages the data fetching and caching.
@@ -60,7 +59,7 @@ WeShare is A full-stack Social Media App project built with React, Node.js, Expr
 - **AWS S3**: for stores and retrieves media.
 
 #### State Management:
-- **Zustand**: Manages global state for for efficient state management.
+- **Zustand**: Manages global state for efficient state management.
 
 #### Frontend Framework:
 - **React**: Powers the dynamic rendering of components for all features.
@@ -71,7 +70,7 @@ WeShare is A full-stack Social Media App project built with React, Node.js, Expr
 
 ## Getting Started
 
-To get started with Unity, you can clone the GitHub repo and install the dependencies:
+To get started with WeShare, you can clone the GitHub repo and install the dependencies:
 
 git clone https://github.com/ehmedosmanov/WeShare
 
@@ -86,3 +85,4 @@ npm run dev
 ```
 
 The app will be available at http://localhost:5173
+
