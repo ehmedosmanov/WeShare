@@ -31,7 +31,7 @@ WeShare is A full-stack Social Media App project built with React, Node.js, Expr
 - **Search history**
 - **Save post**
 - **Likes functionality**
-- **Dashboard** 📊
+- **Dashboard** 
 - **Infinity scroll** 
 - **Credential Authentication**
 - **Google authentication**
