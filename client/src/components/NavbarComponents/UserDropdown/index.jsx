@@ -16,7 +16,8 @@ import { useLogOut } from '@/hooks/AuthHooks'
 import { Skeleton } from '@/components/ui/skeleton'
 
 const UserDropdown = () => {
-  const { data: currentUser, isLoading, isError, isSuccess } = useGetMe()
+  const { data: currentUser, isLoading } = useGetMe()
+
   const { mutate } = useLogOut()
 
   if (isLoading)
@@ -27,8 +28,6 @@ const UserDropdown = () => {
         </Avatar>
       </>
     )
-
-  console.log('AYBLETTTTTTTTTTTTTTTTTTTTTT', currentUser)
 
   return (
     <>

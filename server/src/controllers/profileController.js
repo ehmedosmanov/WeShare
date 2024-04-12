@@ -100,7 +100,6 @@ export const getUserSavedPosts = async (req, res) => {
       return res.status(404).json({ message: 'User not found' })
     }
 
-    // Предполагается, что функция getObjectSignedUrl получает URL с подписью для доступа к медиа
     await Promise.all(
       userWithSavedPosts.savedPosts.map(async post => {
         await Promise.all(

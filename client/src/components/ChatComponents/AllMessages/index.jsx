@@ -32,19 +32,19 @@ const Messages = () => {
       </span>
     )
 
-  const conversationMessages = isGroup ? groupMessages : messages
+  // const conversationMessages = isGroup ? groupMessages : messages
 
   return (
     <>
       <div className='messages h-full  overflow-auto'>
-        {conversationMessages?.length > 0 &&
-          conversationMessages.map(message => (
+        {messages?.length > 0 &&
+          messages.map(message => (
             <div ref={lastMessage} key={message?._id}>
               <Message message={message} />
             </div>
           ))}
       </div>
-      {!isLoading && conversationMessages?.length === 0 && (
+      {!isLoading && messages?.length === 0 && (
         <p className='text-center text-lg flex justify-center items-center font-bold'>
           Send a message to start the conversation
         </p>

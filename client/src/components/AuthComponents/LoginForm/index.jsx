@@ -23,9 +23,10 @@ import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { useNavigate } from 'react-router-dom'
 import { api } from '@/services/api'
 import Logo from '@/assets/share-2.png'
+
 const FormSchema = z.object({
-  username: z.string(),
-  password: z.string(),
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(8, "Password must be at least 8 characters long"),
   email: z.string()
 })
 
@@ -134,23 +135,6 @@ const LoginForm = () => {
               )}
             />
             <div className='flex justify-between'>
-              {/* <FormField
-                control={form.control}
-                name='rememberMe'
-                render={({ field }) => (
-                  <FormItem className='flex flex-row items-center space-x-3 space-y-0'>
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className='space-y-1 leading-none'>
-                      <FormLabel>Remember Me</FormLabel>
-                    </div>
-                  </FormItem>
-                )}
-              /> */}
               <Link
                 type='button'
                 className='text-sm border-b pb-[1px] border-primary'

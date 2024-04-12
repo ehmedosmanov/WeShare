@@ -22,8 +22,6 @@ const UserSavedPosts = ({ id }) => {
     threshold: 0.1
   })
 
-  console.log('saved posts', data)
-
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage()

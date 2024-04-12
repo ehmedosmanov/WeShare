@@ -13,11 +13,17 @@ const HomePosts = () => {
     useGetFollowingsPosts()
   const [activeVideo, setActiveVideo] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
-
+  const [shouldFetch, setshouldFetch] = useState(false)
+  
+  
+  
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1
   })
+  useEffect(() => {
+        setshouldFetch(true)      
+  }, [])
 
   const controls = useAnimation()
 
@@ -28,10 +34,11 @@ const HomePosts = () => {
   }, [controls, inView])
 
   useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
+    if (shouldFetch && hasNextPage && !isFetchingNextPage) {
       fetchNextPage()
+      setshouldFetch(false)
     }
-  }, [inView, hasNextPage, fetchNextPage, isFetchingNextPage])
+  }, [shouldFetch, hasNextPage, fetchNextPage, isFetchingNextPage])
 
   const swiperRef = useRef(null)
 

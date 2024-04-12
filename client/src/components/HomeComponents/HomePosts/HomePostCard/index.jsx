@@ -45,6 +45,7 @@ import { Modal } from '@/components/ui/modal'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { savePost } from '@/services/post-service'
 import { FaBookmark } from 'react-icons/fa'
+import { toast } from 'sonner'
 
 const HomePostCard = ({
   post,
@@ -78,28 +79,28 @@ const HomePostCard = ({
   const [postLike, setPostLike] = useState(null)
   const [clickedByMe, setClickedByMe] = useState(null)
   // const { data: likes, i } = useGetPost(post._id)
-  const [isLiked, setIsLiked] = useState(null)
+  const [isLiked, setIsLiked] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
   const queryClient = useQueryClient()
-  const { mutateAsync } = useMutation({
-    mutationFn: savePost,
-    mutationKey: ['save-post', post?._id],
-    onMutate: async id => {
-      await queryClient.refetchQueries(['me'])
-      await queryClient.refetchQueries(['userSavedPosts', currentUser?._id])
-      await queryClient.cancelQueries(['post', id])
-      const previousPost = queryClient.getQueryData(['post', id])
-      return { previousPost }
-    },
-    onError: (err, id, context) => {
-      queryClient.setQueryData(['post', id], context.previousPost)
-    },
-    onSettled: (data, error, id) => {
-      if (data) {
-        queryClient.setQueryData(['post', id], data)
-      }
-    }
-  })
+  // const { mutateAsync } = useMutation({
+  //   mutationFn: savePost,
+  //   mutationKey: ['save-post', post?._id],
+  //   onMutate: async id => {
+  //     await queryClient.invalidateQueries(['me'])
+  //     await queryClient.invalidateQueries(['userSavedPosts', currentUser?._id])
+  //     await queryClient.cancelQueries(['post', id])
+  //     const previousPost = queryClient.getQueryData(['post', id])
+  //     return { previousPost }
+  //   },
+  //   onError: (err, id, context) => {
+  //     queryClient.setQueryData(['post', id], context.previousPost)
+  //   },
+  //   onSettled: (data, error, id) => {
+  //     if (data) {
+  //       queryClient.setQueryData(['post', id], data)
+  //     }
+  //   }
+  // })
 
   const handleOpenPost = useCallback(
     id => {
@@ -110,7 +111,6 @@ const HomePostCard = ({
     [setPostId, setId, setOpenDialog]
   )
 
-  console.log('IS SAVED', isSaved)
 
   const handleLike = async () => {
     setIsLiked(current => !current)
@@ -138,20 +138,47 @@ const HomePostCard = ({
     }
   }
 
-  const handleSave = async id => {
+    const handleSave = async id => {
     setIsSaved(current => !current)
-    await mutateAsync(id, {
-      onError: () => {
-        setIsSaved(current => !current)
-      },
-      onSuccess: data => {
-        const isPostSaved = data.savedPosts?.some(
-          savedPostId => savedPostId === id
-        )
-        setIsSaved(isPostSaved)
+    try {
+      const res = await api.post(
+        '/like/save-post',
+        { id: post?._id },
+        {
+          withCredentials: true
+        }
+      )
+      toast.success('Save Success')
+      if (!res.data) {
+        throw new Error('No data received from server')
       }
-    })
+      const savedPost = await api.get(`/post/get-post/${post?._id}`, {
+        withCredentials: true
+      });
+      const savedPostData = savedPost.data;
+      // Обновление списка сохраненных постов
+      queryClient.setQueryData(['post', id], savedPostData);
+      queryClient.invalidateQueries(['userSavedPosts', currentUser?._id]);
+    } catch (error) {
+      console.log(error)
+      setIsSaved(current => !current); 
+    }
   }
+
+  // const handleSave = async id => {
+  //   setIsSaved(current => !current)
+  //   await mutateAsync(id, {
+  //     onError: () => {
+  //       setIsSaved(current => !current)
+  //     },
+  //     onSuccess: data => {
+  //       const isPostSaved = data.savedPosts?.some(
+  //         savedPostId => savedPostId === id
+  //       )
+  //       setIsSaved(isPostSaved)
+  //     }
+  //   })
+  // }
 
   useEffect(() => {
     setIsLiked(post.likes.includes(currentUser?._id))
@@ -161,9 +188,9 @@ const HomePostCard = ({
   useEffect(() => {
     const isPostSaved = currentUser?.savedPosts?.some(
       savedPostId => savedPostId === post._id
-    )
-    setIsSaved(isPostSaved)
-  }, [currentUser, post._id])
+    );
+    setIsSaved(isPostSaved);
+  }, [currentUser, post._id]);
 
   useEffect(() => {
     postLikes?.includes(currentUser?._id)

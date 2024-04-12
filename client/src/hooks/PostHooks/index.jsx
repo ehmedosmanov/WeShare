@@ -31,6 +31,7 @@ export const useGetFollowingsPosts = () => {
   return useInfiniteQuery({
     queryFn: getFollowingsPosts,
     queryKey: ['followingsPosts'],
+    staleTime: 1000 * 60 * 5,
     getNextPageParam: lastPage => {
       return lastPage.posts.length ? lastPage.nextPage : null
     }

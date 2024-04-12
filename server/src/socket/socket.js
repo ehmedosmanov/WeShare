@@ -27,6 +27,9 @@ io.on('connection', socket => {
   const userId = socket.handshake.query.userId
   if (userId != 'undefined') userSocketMap[userId] = socket.id
 
+
+  console.log('a socket connected help me', socket.id)
+
   io.emit('getOnlineUsers', Object.keys(userSocketMap))
 
   socket.on('markMessagesAsSeen', async ({ conversationId, userId }) => {
@@ -51,6 +54,7 @@ io.on('connection', socket => {
   })
 
   socket.on('newMessage', newMessage => {
+    console.log('ISLEYIR BUUUUUUUUUUUUUUUUU', newMessage)
     io.emit('newMessage', newMessage)
   })
 

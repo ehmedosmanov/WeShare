@@ -58,14 +58,14 @@ const Comment = ({ replyHandle, comment, currentUserId }) => {
                   variant='link'>
                   Reply
                 </Button>
-                <span>
-                  <AlertDialog className='z-100'>
+                <span className=''>
+                  <AlertDialog className='!z-[120]'>
                     {comment?.user?._id === currentUserId ? (
                       <AlertDialogTrigger asChild>
                         <Button variant='link'>• • •</Button>
                       </AlertDialogTrigger>
                     ) : null}
-                    <AlertDialogContent>
+                    <AlertDialogContent className="z-[999999]">
                       <AlertDialogAction
                         onClick={() => mutate(comment?._id)}
                         className='bg-red-600/70'>

@@ -58,42 +58,7 @@ export const sendMessage = async (req, res) => {
   }
 }
 
-// export const sendMessage = async (req, res) => {
-//   try {
-//     const { message } = req.body
-//     const { id } = req.params // id беседы
-//     const senderId = req.user.userId
 
-//     let conversation = await Conversation.findById(id)
-
-//     if (!conversation) {
-//       return res.status(404).json({ message: 'Conversation not found' })
-//     }
-
-//     const newMessage = new Message({
-//       sender: senderId,
-//       receiver: id,
-//       messageType: 'text',
-//       message
-//     })
-
-//     if (newMessage) {
-//       conversation.messages.push(newMessage._id)
-//     }
-
-//     await Promise.all([conversation.save(), newMessage.save()])
-
-//     const receiverSocketId = getReceiverSocketId(id)
-
-//     if (receiverSocketId) {
-//       io.to(receiverSocketId).emit('newMessage', newMessage)
-//     }
-
-//     res.status(201).json(newMessage)
-//   } catch (error) {
-//     res.status(500).json({ message: error.message })
-//   }
-// }
 
 export const getMessages = async (req, res) => {
   try {
@@ -115,7 +80,6 @@ export const getMessages = async (req, res) => {
         return message
       })
     )
-    console.log(messages)
     res.status(200).json(messages)
   } catch (error) {
     res.status(500).json({ message: error.message })
@@ -135,7 +99,6 @@ export const sendVoiceMessage = async (req, res) => {
     )
     const voiceMessageUrl = await getObjectSignedUrl(voiceMessage.originalname)
 
-    console.log(voiceMessageUrl)
 
     let conversation = await Conversation.findOne({
       participants: { $all: [senderId, id] }
@@ -147,7 +110,6 @@ export const sendVoiceMessage = async (req, res) => {
       })
     }
 
-    console.log('url', voiceMessageUrl)
 
     const voiceMessageId = voiceMessage.originalname
 
@@ -213,8 +175,6 @@ export const getUserInbox = async (req, res) => {
         return otherUser
       })
     )
-
-    console.log(`Conversation`, otherUsers)
 
     res.status(200).json(otherUsers)
   } catch (error) {

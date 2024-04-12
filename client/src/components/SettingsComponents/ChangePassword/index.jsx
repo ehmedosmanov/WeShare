@@ -13,6 +13,11 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useForm } from 'react-hook-form'
 import { useChangePassword } from '@/hooks/UsersHooks'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { FormMessage } from '@/components/ui/form'
+
+
 
 const ChangePasswordTab = ({ value }) => {
   const { formState, register, reset, handleSubmit, setValue } = useForm({

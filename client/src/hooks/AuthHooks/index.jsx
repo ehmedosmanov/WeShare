@@ -36,8 +36,9 @@ export const useLogin = () => {
     mutationKey: ['login'],
     onError: error => {
       if (error) {
-        console.log(error)
-        toast.error(error.response.data.error)
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Failed to connect to the server. Please try again later.')
       }
     },
     onSuccess: () => {
@@ -53,7 +54,6 @@ export const useIsAuth = () => {
     queryKey: ['status'],
     onSuccess: data => {
       if (data && data?.isAuthenticated) {
-        console.log('bu nedi ala', data.isAuthenticated)
         toast.success('is auth User is authenticated')
       }
     },

@@ -33,9 +33,9 @@ export const useSendVoiceMessage = () => {
 export const useGetMessages = id => {
   return useQuery({
     queryFn: () => getMessages(id),
-    staleTime: 1000 * 60,
+    staleTime: 1000 * 60 * 2,
     queryKey: ['messages', id],
-    refetchOnWindowFocus: true
+    refetchOnWindowFocus: false
   })
 }
 

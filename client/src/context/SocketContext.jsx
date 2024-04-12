@@ -16,7 +16,7 @@ export const SocketContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      const socket = io('https://weshareserver.onrender.com', {
+      const socket = io('http://localhost:8000', {
         query: {
           userId: user._id
         }
@@ -35,6 +35,18 @@ export const SocketContextProvider = ({ children }) => {
           newMessage
         ])
       })
+
+
+      socket.on('newVoiceMessage', newVoiceMessage => {
+        console.log(newVoiceMessage)
+        queryClient.invalidateQueries(['messages', newVoiceMessage.id])
+        queryClient.setQueryData(['messages', newVoiceMessage.id], old => [
+          ...old,
+          newVoiceMessage
+        ])
+      })
+
+
 
       return () => socket.close()
     } else {

@@ -10,17 +10,28 @@ import React, { useEffect, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Pagination, Navigation } from 'swiper/modules'
 import ReactPlayer from 'react-player'
-import { useGetUserPosts } from '@/hooks/UsersHooks'
+import { useGetMe, useGetUserPosts } from '@/hooks/UsersHooks'
 import PostCard from '@/components/Common/PostCard'
 import PostSkeleton from './PostSkeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import UserSavedPosts from '../UserSavedPosts'
-
+import { useLocation } from 'react-router-dom'
+import { cn } from '@/lib/utils'
 const UserPosts = ({ id }) => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useGetUserPosts(id)
   //   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
   // useGetUserPosts(id)
+  const { data: currentUser, isLoading } = useGetMe()
+  const location = useLocation()
+
+  if (isLoading) {
+    return (
+      <h1>
+        <MoonLoader size={14} />
+      </h1>
+    )
+  }
 
   const [ref, inView] = useInView({
     triggerOnce: false,
@@ -35,13 +46,18 @@ const UserPosts = ({ id }) => {
 
   console.log(data)
 
+  const isOwnSaved =
+    location.pathname.split('/profile/')[1] === currentUser?._id
   return (
     <section>
       <Tabs defaultValue='posts'>
         <div className='divider h-[2px] mt-12 w-12/12 bg-primary-foreground/90'></div>
-        <TabsList className='w-6/12 items-center justify-center mx-auto my-6 grid grid-cols-2'>
+        <TabsList
+          className={`w-6/12 items-center justify-center mx-auto my-6 grid ${
+            isOwnSaved ? 'grid-cols-2' : 'grid-cols-1'
+          }`}>
           <TabsTrigger value='posts'>Posts</TabsTrigger>
-          <TabsTrigger value='saved'>Saved</TabsTrigger>
+          {isOwnSaved && <TabsTrigger value='saved'>Saved</TabsTrigger>}
         </TabsList>
         <TabsContent value='posts'>
           <div className='posts'>
@@ -67,31 +83,18 @@ const UserPosts = ({ id }) => {
             </div>
           </div>
         </TabsContent>
-        <TabsContent value='saved'>
-          <div className='saved'>
-            <div className='heading flex justify-start py-6'>
-              <h3 className='text-3xl font-bold text-primary'>Saved Posts</h3>
+        {isOwnSaved && (
+          <TabsContent value='saved'>
+            <div className='saved'>
+              <div className='heading flex justify-start py-6'>
+                <h3 className='text-3xl font-bold text-primary'>Saved Posts</h3>
+              </div>
+              <div className='posts py-4 gap-1 grid grid-cols-2 md:grid-cols-3'>
+                <UserSavedPosts id={id} />
+              </div>
             </div>
-            <div className='posts py-4 gap-1 grid grid-cols-2 md:grid-cols-3'>
-              {/* {data &&
-                data?.pages?.map((page, pageIndex) =>
-                  page?.posts?.map((post, postIndex) => (
-                    <PostCard
-                      userId={id}
-                      post={post}
-                      key={post?._id}
-                      isLastPost={
-                        pageIndex === data.pages.length - 1 &&
-                        postIndex === page.posts.length - 1
-                      }
-                      onIntersect={ref}
-                    />
-                  ))
-                )} */}
-              <UserSavedPosts id={id} />
-            </div>
-          </div>
-        </TabsContent>
+          </TabsContent>
+        )}
       </Tabs>
     </section>
   )

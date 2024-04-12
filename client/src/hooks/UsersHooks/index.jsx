@@ -198,7 +198,13 @@ export const useChangePassword = () => {
     mutationFn: data => changeUserPassword(data),
     mutationKey: ['changePassword'],
     onSuccess: () => toast.success('Password changed successfully'),
-    onError: error => toast.error(error.response.data.error)
+    onError: error => {
+      if (error) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Failed to connect to the server. Please try again later.')
+      }
+    }
   })
 }
 

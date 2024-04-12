@@ -11,8 +11,6 @@ const MessageInput = () => {
   const [message, setMessage] = useState('')
   const { mutate: sendVoice, isPending: sendPending } = useSendVoiceMessage()
   const { mutate, isPending } = useSendMessage()
-  const { mutate: sendGroupMessage, isPending: sendGroupPending } =
-    useGroupSendMessage()
   const [audioData, setAudioData] = useState(null)
 
   console.log(audioData)
@@ -24,7 +22,7 @@ const MessageInput = () => {
     setAudioData(blob)
   }
 
-  const handleSubmit = e => {
+  const handleSubmit =  e => {
     e.preventDefault()
     if (audioData) {
       const formData = new FormData()
@@ -35,35 +33,14 @@ const MessageInput = () => {
       })
       setAudioData(null)
     } else if (message) {
-      const isGroup = selectedConversation?.isGroup
-
-      const sendFunction = isGroup ? sendGroupMessage : mutate
-
-      sendFunction({
+    
+      mutate({
         message: message,
         id: selectedConversation?._id
       })
       setMessage('')
     }
   }
-  // const handleSubmit = e => {
-  //   e.preventDefault()
-  //   if (audioData) {
-  //     const formData = new FormData()
-  //     formData.append('voiceMessage', audioData, 'voiceMessage.webm')
-  //     sendVoice({
-  //       id: selectedConversation?._id,
-  //       formData: formData
-  //     })
-  //     setAudioData(null)
-  //   } else if (message) {
-  //     mutate({
-  //       message: message,
-  //       id: selectedConversation?._id
-  //     })
-  //     setMessage('')
-  //   }
-  // }
 
   const handleKeyPress = e => {
     console.log(e.key === 'Enter')
@@ -75,7 +52,7 @@ const MessageInput = () => {
 
   return (
     <>
-      <div className='pt-16 pb-2 mb-[56px]'>
+      <div className='pt-16 pb-2'>
         <div className='write bg-background items-center shadow flex rounded-lg'>
           <div className='flex-3 flex content-center items-center text-center p-4 pr-0'>
             <span className='block text-center text-gray-400 hover:text-gray-800'></span>

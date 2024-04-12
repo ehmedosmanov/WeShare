@@ -11,7 +11,7 @@ const Conversation = ({ avatar, part, username }) => {
   const { onlineUsers } = useSocketContext()
   const isSelected = selectedConversation?._id === part?._id
 
-  const isOnline = onlineUsers.includes(part?._id)
+  const isOnline = onlineUsers?.includes(part?._id)
 
   const handleClickConversation = user => {
     setSelectedConversation(user)
