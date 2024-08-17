@@ -318,8 +318,16 @@ export const verifyOtp = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    res.clearCookie('accessToken')
-    res.clearCookie('refreshToken')
+    res.clearCookie('accessToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax'
+    })
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax'
+    })
     res.json({ message: 'Logout successful' })
   } catch (error) {
     res.status(500).json({ message: error.message })
