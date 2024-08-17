@@ -33,9 +33,8 @@ export const authWithGoogle = async (req, res) => {
         avatar: avatarUrl,
         firstName: me.data.names[0].givenName,
         lastName: me.data.names[0].familyName || ' ',
-        username: `${me.data.names[0].givenName}${
-          me.data.names[0].familyName || ' '
-        }`,
+        username: `${me.data.names[0].givenName}${me.data.names[0].familyName || ' '
+          }`,
         email: me.data.emailAddresses[0].value,
         password: crypto.randomBytes(20).toString('hex'),
         googleId: me.data.resourceName.split('/')[1],
@@ -50,13 +49,18 @@ export const authWithGoogle = async (req, res) => {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       origin: process.env.CLIENT_URL,
-      maxAge: 30 * 24 * 60 * 60 * 1000
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax'
     })
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       origin: process.env.CLIENT_URL,
-      maxAge: 30 * 24 * 60 * 60 * 1000
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax'
+
     })
 
     console.log('token', accessToken)
@@ -134,12 +138,18 @@ export const login = async (req, res) => {
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000
+      maxAge: 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax'
+
     })
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000
+      maxAge: 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax'
+
     })
 
     res.status(200).json(user)
@@ -207,7 +217,9 @@ export const refreshAccessToken = async (req, res) => {
 
     res.cookie('accessToken', newToken, {
       httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax'
     })
 
     console.log('Access Token refreshed successfully')
@@ -272,12 +284,16 @@ export const verifyEmail = async (req, res) => {
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax'
     })
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax'
     })
     res.status(200).json({ message: 'Account confirmed' })
   } catch (error) {
